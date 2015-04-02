@@ -23,11 +23,11 @@ public class Client {
 
 		try {
 
-			System.out.println("Start socket");
+			System.out.println("start socket");
 			Socket socket = new Socket("127.0.0.1", 4700);
-			System.out.println("Start bind Blink");
+			System.out.println("start bind Blink");
 			conn = bindBlink(socket);
-			System.out.println("Blink socket.");
+			System.out.println("start blink socket.");
 		} catch (Exception e) {
 			System.out.println("Error" + e);
 		}

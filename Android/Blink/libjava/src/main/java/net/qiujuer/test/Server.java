@@ -35,15 +35,15 @@ public class Server {
 				socket = server.accept();
 				System.out.println("new link socket; start bind...");
 				bindBlink(socket);
-				System.out.println("Bind ok.");
+				System.out.println("bind ok.");
 			} catch (Exception e) {
-				System.out.println("Error." + e);
+				System.out.println("error." + e);
 			}
 
 			// socket.close();
 			// server.close();
 		} catch (Exception e) {
-			System.out.println("Error:" + e);
+			System.out.println("error:" + e);
 		}
 	}
 
@@ -92,12 +92,14 @@ public class Server {
 							+ entity.getLength()
 							+ " :"
 							+ ((FileReceiveEntity) entity).getResult()
-									.getPath());
+									.getPath() + " " + entity.getHashCode());
 			}
 		};
 
 		BlinkConn conn = Blink.newConnection(socket, 4 * 1024 * 1024,
 				"D:/Blink/", UUID.randomUUID().toString(), executor, listener);
 
+		// Clear all files
+		conn.getResource().clearAll();
 	}
 }
