@@ -1,4 +1,4 @@
-package net.qiujuer.blink;
+package net.qiujuer.blink.core;
 
 import net.qiujuer.blink.listener.ReceiveListener;
 
@@ -25,15 +25,15 @@ public abstract class ReceiveDelivery {
     /**
      * Parses a start response from the receiver.
      */
-    public abstract void postReceiveStart(ReceiveEntity entity);
+    public abstract void postReceiveStart(ReceivePacket entity);
 
     /**
      * Parses a end response from the receiver.
      */
-    public abstract void postReceiveEnd(ReceiveEntity entity, boolean isSuccess);
+    public abstract void postReceiveEnd(ReceivePacket entity, boolean isSuccess);
 
     /**
      * Parses a progress response from the receiver.
      */
-    public abstract void postReceiveProgress(ReceiveEntity entity, int total, int cur);
+    public abstract void postReceiveProgress(ReceivePacket entity, int total, int cur);
 }

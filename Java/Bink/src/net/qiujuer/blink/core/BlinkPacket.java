@@ -1,22 +1,25 @@
-package net.qiujuer.blink;
+package net.qiujuer.blink.core;
 
 /**
- * Blink send and receive datagram entity
+ * Blink Data Packet
  */
-public abstract class Entity {
-    private int mType;
+public abstract class BlinkPacket<T> extends EntityNode<T> implements HeadNode {
+    protected int mType;
+    protected int mLength;
     private boolean mSucceed;
 
-    public Entity(int type) {
+    public BlinkPacket(int type) {
         mType = type;
     }
 
-    public void setType(int type) {
-        mType = type;
-    }
-
+    @Override
     public int getType() {
         return mType;
+    }
+
+    @Override
+    public int getLength() {
+        return mLength;
     }
 
     public void setSuccess(boolean isSuccess) {
@@ -27,8 +30,6 @@ public abstract class Entity {
         return mSucceed;
     }
 
-    public abstract int getLength();
-
     /**
      * Blink Entity Type
      */
@@ -37,4 +38,6 @@ public abstract class Entity {
         int BYTES = 1;
         int FILE = 2;
     }
+
+
 }

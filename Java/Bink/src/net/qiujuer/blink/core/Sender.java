@@ -1,4 +1,4 @@
-package net.qiujuer.blink;
+package net.qiujuer.blink.core;
 
 /**
  * Send entity interface
@@ -11,7 +11,7 @@ public interface Sender {
      * @param entity SendEntity
      * @return Status
      */
-    boolean sendHead(SendEntity entity);
+    boolean sendHead(SendPacket entity);
 
     /**
      * Send entity
@@ -19,7 +19,7 @@ public interface Sender {
      * @param entity SendEntity
      * @return Status
      */
-    boolean sendEntity(SendEntity entity, SendDelivery delivery);
+    boolean sendEntity(SendPacket entity, SendDelivery delivery);
 
     /**
      * Destroy the sender IO stream

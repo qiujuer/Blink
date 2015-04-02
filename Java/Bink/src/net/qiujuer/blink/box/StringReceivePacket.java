@@ -1,6 +1,6 @@
 package net.qiujuer.blink.box;
 
-import net.qiujuer.blink.ReceiveEntity;
+import net.qiujuer.blink.core.ReceivePacket;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -8,22 +8,22 @@ import java.io.UnsupportedEncodingException;
 /**
  * String receive class
  */
-public class StringReceiveEntity extends ReceiveEntity<String> {
-    public StringReceiveEntity(long id, int type, int len) {
+public class StringReceivePacket extends ReceivePacket<String> {
+    public StringReceivePacket(long id, int type, int len) {
         super(id, type, len);
     }
 
     @Override
-    public void initOutputStream() {
+    protected void adjustStream() {
         mOutStream = new ByteArrayOutputStream(getLength());
     }
 
     @Override
-    public void adjustResult() {
+    protected void adjustPacket() {
         if (mOutStream != null) {
             byte[] bytes = ((ByteArrayOutputStream) mOutStream).toByteArray();
             try {
-                mResult = new String(bytes, 0, bytes.length, "UTF-8");
+                mEntity = new String(bytes, 0, bytes.length, "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

@@ -1,4 +1,4 @@
-package net.qiujuer.blink;
+package net.qiujuer.blink.core;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -9,7 +9,7 @@ public class SendDispatcher extends Thread {
     /**
      * The queue of send entity.
      */
-    private final BlockingQueue<SendEntity<?>> mQueue;
+    private final BlockingQueue<SendPacket<?>> mQueue;
     /**
      * The sender interface for processing sender requests.
      */
@@ -23,7 +23,7 @@ public class SendDispatcher extends Thread {
      */
     private volatile boolean mQuit = false;
 
-    public SendDispatcher(BlockingQueue<SendEntity<?>> queue,
+    public SendDispatcher(BlockingQueue<SendPacket<?>> queue,
                           Sender sender, SendDelivery delivery) {
         mQueue = queue;
         mSender = sender;
@@ -42,7 +42,7 @@ public class SendDispatcher extends Thread {
     @Override
     public void run() {
         while (true) {
-            SendEntity<?> entity;
+            SendPacket<?> entity;
             try {
                 // Take a request from the queue.
                 entity = mQueue.take();

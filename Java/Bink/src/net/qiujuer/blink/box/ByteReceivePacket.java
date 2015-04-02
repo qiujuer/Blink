@@ -1,28 +1,28 @@
 package net.qiujuer.blink.box;
 
-import net.qiujuer.blink.ReceiveEntity;
+import net.qiujuer.blink.core.ReceivePacket;
 
 import java.io.ByteArrayOutputStream;
 
 /**
  * Bytes receive class
  */
-public class ByteReceiveEntity extends ReceiveEntity<byte[]> {
+public class ByteReceivePacket extends ReceivePacket<byte[]> {
 
-    public ByteReceiveEntity(long id, int type, int len) {
+    public ByteReceivePacket(long id, int type, int len) {
         super(id, type, len);
     }
 
 
     @Override
-    public void initOutputStream() {
+    protected void adjustStream() {
         mOutStream = new ByteArrayOutputStream(getLength());
     }
 
     @Override
-    public void adjustResult() {
+    protected void adjustPacket() {
         if (mOutStream != null) {
-            mResult = ((ByteArrayOutputStream) mOutStream).toByteArray();
+            mEntity = ((ByteArrayOutputStream) mOutStream).toByteArray();
             mOutStream = null;
         }
     }

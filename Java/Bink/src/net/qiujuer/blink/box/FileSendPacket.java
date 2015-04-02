@@ -1,6 +1,6 @@
 package net.qiujuer.blink.box;
 
-import net.qiujuer.blink.SendEntity;
+import net.qiujuer.blink.core.SendPacket;
 import net.qiujuer.blink.listener.SendListener;
 
 import java.io.File;
@@ -11,13 +11,13 @@ import java.io.InputStream;
 /**
  * File send class
  */
-public class FileSendEntity extends SendEntity<File> {
+public class FileSendPacket extends SendPacket<File> {
 
-    public FileSendEntity(File file) {
+    public FileSendPacket(File file) {
         this(file, null);
     }
 
-    public FileSendEntity(File entity, SendListener listener) {
+    public FileSendPacket(File entity, SendListener listener) {
         super(Type.FILE, entity, listener);
     }
 

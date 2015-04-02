@@ -1,4 +1,4 @@
-package net.qiujuer.blink;
+package net.qiujuer.blink.core;
 
 import java.io.File;
 

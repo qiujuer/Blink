@@ -1,4 +1,4 @@
-package net.qiujuer.blink;
+package net.qiujuer.blink.core;
 
 /**
  * Receive entity interface
@@ -10,7 +10,7 @@ public interface Receiver {
      *
      * @return ReceiveEntity
      */
-    ReceiveEntity<?> receiveHead();
+    ReceivePacket<?> receiveHead();
 
 
     /**
@@ -20,7 +20,7 @@ public interface Receiver {
      * @param delivery ReceiveDelivery
      * @return ReceiveEntity
      */
-    boolean receiveEntity(ReceiveEntity<?> entity, ReceiveDelivery delivery);
+    boolean receiveEntity(ReceivePacket<?> entity, ReceiveDelivery delivery);
 
     /**
      * Destroy the receive IO stream

@@ -1,6 +1,6 @@
 package net.qiujuer.blink.box;
 
-import net.qiujuer.blink.ReceiveEntity;
+import net.qiujuer.blink.core.ReceivePacket;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,23 +9,23 @@ import java.io.FileOutputStream;
 /**
  * File receive class
  */
-public class FileReceiveEntity extends ReceiveEntity<File> {
-    public FileReceiveEntity(long id, int type, int len, File file) {
+public class FileReceivePacket extends ReceivePacket<File> {
+    public FileReceivePacket(long id, int type, int len, File file) {
         super(id, type, len);
-        mResult = file;
+        mEntity = file;
     }
 
     @Override
-    public void initOutputStream() {
+    protected void adjustStream() {
         try {
-            mOutStream = new FileOutputStream(mResult);
+            mOutStream = new FileOutputStream(mEntity);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void adjustResult() {
+    protected void adjustPacket() {
         mOutStream = null;
     }
 }

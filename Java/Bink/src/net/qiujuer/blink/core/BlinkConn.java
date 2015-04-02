@@ -1,8 +1,8 @@
-package net.qiujuer.blink;
+package net.qiujuer.blink.core;
 
-import net.qiujuer.blink.box.ByteSendEntity;
-import net.qiujuer.blink.box.FileSendEntity;
-import net.qiujuer.blink.box.StringSendEntity;
+import net.qiujuer.blink.box.ByteSendPacket;
+import net.qiujuer.blink.box.FileSendPacket;
+import net.qiujuer.blink.box.StringSendPacket;
 import net.qiujuer.blink.listener.SendListener;
 
 import java.io.File;
@@ -16,8 +16,8 @@ public class BlinkConn {
     /**
      * The queue of sends that are actually going out to the io.
      */
-    private final PriorityBlockingQueue<SendEntity<?>> mSendQueue =
-            new PriorityBlockingQueue<SendEntity<?>>();
+    private final PriorityBlockingQueue<SendPacket<?>> mSendQueue =
+            new PriorityBlockingQueue<SendPacket<?>>();
 
     /**
      * The sender interface for processing sender requests.
@@ -41,9 +41,25 @@ public class BlinkConn {
      */
     private final Resource mResource;
 
+    /**
+     * SendDispatcher to send entity
+     */
     private SendDispatcher mSendDispatcher;
+
+    /**
+     * ReceiveDispatcher use to receive entity
+     */
     private ReceiveDispatcher mReceiveDispatcher;
 
+    /**
+     * Create a BlinkConn to IO helper
+     *
+     * @param sender          Sender {@link Sender}
+     * @param sendDelivery    SendDelivery {@link SendDelivery}
+     * @param receiver        Receiver {@link Receiver}
+     * @param receiveDelivery ReceiveDelivery {@link ReceiveDelivery}
+     * @param resource        Resource {@link Resource}
+     */
     public BlinkConn(Sender sender, SendDelivery sendDelivery, Receiver receiver, ReceiveDelivery receiveDelivery, Resource resource) {
         mSender = sender;
         mSendDelivery = sendDelivery;
@@ -75,6 +91,12 @@ public class BlinkConn {
         if (mResource != null)
             mResource.clear();
 
+        if (mSender != null)
+            mSender.destroySendIO();
+
+        if (mReceiver != null)
+            mReceiver.destroyReceiveIO();
+
         if (mSendDispatcher != null)
             mSendDispatcher.quit();
 
@@ -95,11 +117,11 @@ public class BlinkConn {
     /**
      * Send a Entity to queue
      *
-     * @param entity SendEntity<T> {@link SendEntity}
+     * @param entity SendEntity<T> {@link SendPacket}
      * @param <T>    Extends SendEntity
      * @return SendEntity<T>
      */
-    public <T> SendEntity<T> send(SendEntity<T> entity) {
+    public <T> SendPacket<T> send(SendPacket<T> entity) {
         entity.setBlinkConn(this);
 
         synchronized (mSendQueue) {
@@ -112,9 +134,9 @@ public class BlinkConn {
      * Send file to queue
      *
      * @param file File
-     * @return FileSendEntity {@link FileSendEntity}
+     * @return FileSendEntity {@link FileSendPacket}
      */
-    public FileSendEntity send(File file) {
+    public FileSendPacket send(File file) {
         return send(file, null);
     }
 
@@ -123,10 +145,10 @@ public class BlinkConn {
      *
      * @param file     File
      * @param listener Callback listener
-     * @return FileSendEntity {@link FileSendEntity}
+     * @return FileSendEntity {@link FileSendPacket}
      */
-    public FileSendEntity send(File file, SendListener listener) {
-        FileSendEntity entity = new FileSendEntity(file, listener);
+    public FileSendPacket send(File file, SendListener listener) {
+        FileSendPacket entity = new FileSendPacket(file, listener);
         send(entity);
         return entity;
     }
@@ -135,9 +157,9 @@ public class BlinkConn {
      * Send byte array to queue
      *
      * @param bytes Byte array
-     * @return ByteSendEntity {@link ByteSendEntity}
+     * @return ByteSendEntity {@link ByteSendPacket}
      */
-    public ByteSendEntity send(byte[] bytes) {
+    public ByteSendPacket send(byte[] bytes) {
         return send(bytes, null);
     }
 
@@ -146,10 +168,10 @@ public class BlinkConn {
      *
      * @param bytes    Byte array
      * @param listener Callback listener
-     * @return ByteSendEntity {@link ByteSendEntity}
+     * @return ByteSendEntity {@link ByteSendPacket}
      */
-    public ByteSendEntity send(byte[] bytes, SendListener listener) {
-        ByteSendEntity entity = new ByteSendEntity(bytes, listener);
+    public ByteSendPacket send(byte[] bytes, SendListener listener) {
+        ByteSendPacket entity = new ByteSendPacket(bytes, listener);
         send(entity);
         return entity;
     }
@@ -158,9 +180,9 @@ public class BlinkConn {
      * Send string to queue
      *
      * @param str String msg
-     * @return StringSendEntity {@link StringSendEntity}
+     * @return StringSendEntity {@link StringSendPacket}
      */
-    public StringSendEntity send(String str) {
+    public StringSendPacket send(String str) {
         return send(str, null);
     }
 
@@ -169,12 +191,12 @@ public class BlinkConn {
      *
      * @param str      String msg
      * @param listener Callback listener
-     * @return StringSendEntity {@link StringSendEntity}
+     * @return StringSendEntity {@link StringSendPacket}
      */
-    public StringSendEntity send(String str, SendListener listener) {
-        StringSendEntity entity = null;
+    public StringSendPacket send(String str, SendListener listener) {
+        StringSendPacket entity = null;
         try {
-            entity = new StringSendEntity(str, listener);
+            entity = new StringSendPacket(str, listener);
             send(entity);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -182,7 +204,14 @@ public class BlinkConn {
         return entity;
     }
 
-    <T> void cancel(SendEntity<T> entity) {
+    /**
+     * Protected to cancel entity
+     * see {@link SendPacket#cancel()}
+     *
+     * @param entity SendEntity
+     * @param <T>    Your Entity
+     */
+    <T> void cancel(SendPacket<T> entity) {
         // Remove
         synchronized (mSendQueue) {
             mSendQueue.remove(entity);
