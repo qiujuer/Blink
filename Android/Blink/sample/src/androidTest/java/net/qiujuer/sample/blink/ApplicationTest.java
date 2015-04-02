@@ -1,4 +1,4 @@
-package net.qiujuer.blink;
+package net.qiujuer.sample.blink;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

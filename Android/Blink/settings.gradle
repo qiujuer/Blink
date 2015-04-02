@@ -1,1 +1,1 @@
-include ':app', ':libjava', ':libandroid', ':sample'
+include ':libjava', ':libandroid', ':sample'
