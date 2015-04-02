@@ -1,14 +1,27 @@
+/*
+ * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
+ * WebSite http://www.qiujuer.net
+ * Created 03/31/2015
+ * Changed 04/02/2015
+ * Version 1.0.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.qiujuer.blink.core;
 
-import android.os.Handler;
-import android.os.Looper;
-
-import net.qiujuer.blink.ExecutorDelivery;
-import net.qiujuer.blink.SocketAdapter;
 import net.qiujuer.blink.box.ByteSendPacket;
 import net.qiujuer.blink.box.FileSendPacket;
 import net.qiujuer.blink.box.StringSendPacket;
-import net.qiujuer.blink.listener.ReceiveListener;
 import net.qiujuer.blink.listener.SendListener;
 
 import java.io.File;
@@ -73,47 +86,6 @@ public class BlinkConn {
 
         mSendDelivery = sendDelivery;
         mReceiveDelivery = receiveDelivery;
-
-        // Init this
-        init();
-    }
-
-    /**
-     * Create a BlinkConn to IO helper with main thread callback
-     *
-     * @param sender   Sender {@link Sender}
-     * @param receiver Receiver {@link Receiver}
-     * @param resource Resource {@link Resource}
-     * @param listener ReceiveListener {@link ReceiveListener}
-     */
-    public BlinkConn(Sender sender, Receiver receiver, Resource resource, ReceiveListener listener) {
-        mSender = sender;
-        mReceiver = receiver;
-        mResource = resource;
-
-        ExecutorDelivery delivery = new ExecutorDelivery(new Handler(Looper.getMainLooper()), listener);
-        mSendDelivery = delivery;
-        mReceiveDelivery = delivery;
-
-        // Init this
-        init();
-    }
-
-    /**
-     * Create a BlinkConn to IO helper with main thread callback
-     *
-     * @param adapter  SocketAdapter {@link SocketAdapter} , a Socket IO
-     * @param resource Resource
-     * @param listener ReceiveListener
-     */
-    public BlinkConn(SocketAdapter adapter, Resource resource, ReceiveListener listener) {
-        mSender = adapter;
-        mReceiver = adapter;
-        mResource = resource;
-
-        ExecutorDelivery delivery = new ExecutorDelivery(new Handler(Looper.getMainLooper()), listener);
-        mSendDelivery = delivery;
-        mReceiveDelivery = delivery;
 
         // Init this
         init();
