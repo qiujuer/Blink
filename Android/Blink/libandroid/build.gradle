@@ -17,3 +17,15 @@ android {
         }
     }
 }
+
+task clearJar(type: Delete) {
+    delete '../../Release/blink_android.jar'
+}
+
+task makeJar(type: Copy) {
+    from('build/intermediates/bundles/release/')
+    into('../../Release/')
+    include('classes.jar')
+    rename('classes.jar', 'blink_android.jar')
+}
+makeJar.dependsOn(clearJar, build)
