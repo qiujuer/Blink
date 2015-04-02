@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
+ * WebSite http://www.qiujuer.net
+ * Created 03/31/2015
+ * Changed 04/02/2015
+ * Version 1.0.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.qiujuer.blink;
 
 import net.qiujuer.blink.core.BlinkConn;
@@ -5,9 +24,11 @@ import net.qiujuer.blink.core.ReceiveParser;
 import net.qiujuer.blink.listener.ReceiveListener;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.Socket;
 import java.util.UUID;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class Blink {
     /**
@@ -32,7 +53,7 @@ public class Blink {
      * @throws Exception
      */
     public static BlinkConn newConnection(Socket socket, int socketBufferSize, String resourcePath, String fileMark, Executor executor, ReceiveListener listener) throws Exception {
-        File rootDir = new File(resourcePath);
+        File rootDir = new File(resourcePath, DEFAULT_RESOURCE_DIR);
         DiskResource resource = new DiskResource(rootDir, fileMark);
         ReceiveParser parser = new ReceiveParser(resource);
         SocketAdapter socketAdapter = new SocketAdapter(socket, socketBufferSize, parser);
@@ -94,6 +115,29 @@ public class Blink {
      * @throws Exception
      */
     public static BlinkConn newConnection(Socket socket, Executor executor, ReceiveListener listener) throws Exception {
-        return newConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, DEFAULT_RESOURCE_DIR, UUID.randomUUID().toString(), executor, listener);
+        return newConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, getDefaultResourcePath(), UUID.randomUUID().toString(), executor, listener);
+    }
+
+    /**
+     * Create a Bink connection by socket with SingleThreadExecutor callback
+     *
+     * @param socket   Socket
+     * @param listener ReceiveListener
+     * @return BlinkConn
+     * @throws Exception
+     */
+    public static BlinkConn newConnection(Socket socket, ReceiveListener listener) throws Exception {
+        return newConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, getDefaultResourcePath(), UUID.randomUUID().toString(), Executors.newSingleThreadExecutor(), listener);
+    }
+
+    /**
+     * Get Default path with CanonicalPath
+     *
+     * @return Path
+     * @throws IOException
+     */
+    private static String getDefaultResourcePath() throws IOException {
+        File path = new File("");
+        return path.getCanonicalPath();
     }
 }

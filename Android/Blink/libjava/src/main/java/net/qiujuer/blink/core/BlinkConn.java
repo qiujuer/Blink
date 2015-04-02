@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
+ * WebSite http://www.qiujuer.net
+ * Created 03/31/2015
+ * Changed 04/02/2015
+ * Version 1.0.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package net.qiujuer.blink.core;
 
 import net.qiujuer.blink.box.ByteSendPacket;
@@ -52,7 +71,7 @@ public class BlinkConn {
     private ReceiveDispatcher mReceiveDispatcher;
 
     /**
-     * Create a BlinkConn to IO helper
+     * Create a BlinkConn to IO helper with custom callback
      *
      * @param sender          Sender {@link Sender}
      * @param sendDelivery    SendDelivery {@link SendDelivery}
@@ -62,11 +81,11 @@ public class BlinkConn {
      */
     public BlinkConn(Sender sender, SendDelivery sendDelivery, Receiver receiver, ReceiveDelivery receiveDelivery, Resource resource) {
         mSender = sender;
-        mSendDelivery = sendDelivery;
-
         mReceiver = receiver;
-        mReceiveDelivery = receiveDelivery;
         mResource = resource;
+
+        mSendDelivery = sendDelivery;
+        mReceiveDelivery = receiveDelivery;
 
         // Init this
         init();
