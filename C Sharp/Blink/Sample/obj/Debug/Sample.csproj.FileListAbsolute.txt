@@ -1,0 +1,8 @@
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Sample\obj\Debug\Sample.csprojResolveAssemblyReference.cache
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Sample\bin\Debug\Sample.exe.config
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Sample\bin\Debug\Sample.exe
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Sample\bin\Debug\Sample.pdb
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Sample\bin\Debug\Blink.dll
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Sample\bin\Debug\Blink.pdb
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Sample\obj\Debug\Sample.exe
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Sample\obj\Debug\Sample.pdb

@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{30F08385-9963-42E9-9A18-7CD707336E28}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{FFFFF24C-3971-4B08-8C54-7C77920B0E69}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Net.Qiujuer.Blink</RootNamespace>
-    <AssemblyName>Blink</AssemblyName>
+    <RootNamespace>Sample</RootNamespace>
+    <AssemblyName>Sample</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -39,40 +41,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Blink.cs" />
-    <Compile Include="BlinkLog.cs" />
-    <Compile Include="Box\ByteReceivePacket.cs" />
-    <Compile Include="Box\ByteSendPacket.cs" />
-    <Compile Include="Box\FileReceivePacket.cs" />
-    <Compile Include="Box\FileSendPacket.cs" />
-    <Compile Include="Box\StringReceivePacket.cs" />
-    <Compile Include="Box\StringSendPacket.cs" />
-    <Compile Include="Core\BaseReceivePacket.cs" />
-    <Compile Include="Core\BlinkConn.cs" />
-    <Compile Include="Core\BlinkPacket.cs" />
-    <Compile Include="Core\BaseSendPacket.cs" />
-    <Compile Include="Core\EntityNode.cs" />
-    <Compile Include="Core\HeadNode.cs" />
-    <Compile Include="Core\ReceiveDelivery.cs" />
-    <Compile Include="Core\ReceiveDispatcher.cs" />
-    <Compile Include="Core\ReceivePacket.cs" />
-    <Compile Include="Core\ReceiveParser.cs" />
-    <Compile Include="Core\Receiver.cs" />
-    <Compile Include="Core\Resource.cs" />
-    <Compile Include="Core\SendDelivery.cs" />
-    <Compile Include="Core\SendDispatcher.cs" />
-    <Compile Include="Core\Sender.cs" />
-    <Compile Include="Core\SendPacket.cs" />
-    <Compile Include="DiskResource.cs" />
-    <Compile Include="ExecutorDelivery.cs" />
-    <Compile Include="Listener\ReceiveListener.cs" />
-    <Compile Include="Listener\SendListener.cs" />
+    <Compile Include="CallBack.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SocketAdapter.cs" />
-    <Compile Include="tool\Executor.cs" />
-    <Compile Include="tool\Runnable.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Blink\Blink.csproj">
+      <Project>{30f08385-9963-42e9-9a18-7cd707336e28}</Project>
+      <Name>Blink</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

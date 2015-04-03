@@ -1,0 +1,5 @@
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Blink\bin\Debug\Blink.dll
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Blink\bin\Debug\Blink.pdb
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Blink\obj\Debug\Blink.dll
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Blink\obj\Debug\Blink.pdb
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Blink\obj\Debug\Blink.csprojResolveAssemblyReference.cache
