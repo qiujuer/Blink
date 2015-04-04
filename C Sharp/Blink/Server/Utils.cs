@@ -2,7 +2,7 @@
 using Net.Qiujuer.Blink.Box;
 using Net.Qiujuer.Blink.Core;
 using Net.Qiujuer.Blink.Listener;
-using Net.Qiujuer.Blink.tool;
+using Net.Qiujuer.Blink.Tool;
 using System;
 using System.Collections.Generic;
 using System.Linq;

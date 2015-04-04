@@ -2,12 +2,16 @@
 namespace Net.Qiujuer.Blink.Core
 {
     /// <summary>
-    /// Bink Head Node
+    /// Bink Packet interface
     /// </summary>
-    public interface HeadNode
+    public interface IBlinkPacket
     {
         int GetType();
 
         int GetLength();
+
+        void SetSuccess(bool isSuccess);
+
+        bool IsSucceed();
     }
 }

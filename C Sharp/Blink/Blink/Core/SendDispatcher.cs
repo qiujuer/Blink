@@ -1,16 +1,14 @@
-﻿using System;
+﻿using Net.Qiujuer.Blink.Tool;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink.Core
 {
     /**
      * Provides a thread for performing send dispatch from a queue of BinkConn {@link BlinkConn}.
      */
-    public class SendDispatcher
+    public class SendDispatcher : Runnable
     {
         /**
          * The queue of send entity.
@@ -19,11 +17,11 @@ namespace Net.Qiujuer.Blink.Core
         /**
          * The sender interface for processing sender requests.
          */
-        private readonly Sender mSender;
+        private readonly ISender mSender;
         /**
          * For posting send responses.
          */
-        private readonly SendDelivery mDelivery;
+        private readonly ISendDelivery mDelivery;
         /**
          * Used for telling us to die.
          */
@@ -31,7 +29,7 @@ namespace Net.Qiujuer.Blink.Core
         private Thread mWork;
 
         public SendDispatcher(Queue<SendPacket> queue,
-                              Sender sender, SendDelivery delivery)
+                              ISender sender, ISendDelivery delivery)
         {
             mQueue = queue;
             mSender = sender;
@@ -57,7 +55,7 @@ namespace Net.Qiujuer.Blink.Core
 
         public void Run()
         {
-            while (true)
+            while (!mQuit)
             {
                 SendPacket entity;
                 try
@@ -65,7 +63,7 @@ namespace Net.Qiujuer.Blink.Core
                     // Take a request from the queue.
                     entity = mQueue.Dequeue();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // We may have been interrupted because it was time to quit.
                     if (mQuit)

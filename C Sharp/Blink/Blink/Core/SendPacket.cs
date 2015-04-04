@@ -1,5 +1,6 @@
 ﻿using Net.Qiujuer.Blink.Listener;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -113,6 +114,13 @@ namespace Net.Qiujuer.Blink.Core
             // Equal priorities are sorted by sequence number to provide FIFO
             // ordering.
             //return left == right ? 0 : right.ordinal() - left.ordinal();
+
+            ConcurrentQueue<object> aa = new ConcurrentQueue<object>();
+
+            Action a = () =>
+            {
+            };
+            a.Invoke();
             return 0;
         }
     }

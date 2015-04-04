@@ -10,7 +10,7 @@ namespace Net.Qiujuer.Blink.Core
     /**
      * Blink files Resource
      */
-    public interface Resource
+    public interface IResource
     {
         /**
          * Create a file from resource.

@@ -4,7 +4,7 @@ namespace Net.Qiujuer.Blink.Core
     /// <summary>
     /// Blink Data Packet
     /// </summary>
-    public abstract class BlinkPacket : EntityNode, HeadNode
+    public abstract class BlinkPacket : IBlinkPacket
     {
         protected int mType;
         protected int mLength;
@@ -34,9 +34,6 @@ namespace Net.Qiujuer.Blink.Core
         {
             return mSucceed;
         }
-
-
-        public abstract object GetEntity();
 
         public static class Type
         {

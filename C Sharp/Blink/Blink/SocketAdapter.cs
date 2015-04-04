@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink
 {
-    class SocketAdapter : Sender, Receiver
+    class SocketAdapter : ISender, IReceiver
     {
         private readonly int mBufferSize;
         private byte[] mInBuffer;
@@ -18,11 +18,11 @@ namespace Net.Qiujuer.Blink
         /**
          * Receive Parser to create entity
          */
-        private readonly ReceiveParser mParser;
+        private readonly IBlinkParser mParser;
         private Socket mSocket;
 
 
-        public SocketAdapter(Socket socket, int bufferSize, ReceiveParser parser)
+        public SocketAdapter(Socket socket, int bufferSize, IBlinkParser parser)
         {
             mSocket = socket;
 
@@ -55,7 +55,7 @@ namespace Net.Qiujuer.Blink
             }
         }
 
-        public bool SendEntity(SendPacket entity, SendDelivery delivery)
+        public bool SendEntity(SendPacket entity, ISendDelivery delivery)
         {
             int cursor = 0;
             int total = entity.GetLength();
@@ -132,7 +132,7 @@ namespace Net.Qiujuer.Blink
             return null;
         }
 
-        public bool ReceiveEntity(ReceivePacket entity, ReceiveDelivery delivery)
+        public bool ReceiveEntity(ReceivePacket entity, IReceiveDelivery delivery)
         {
             Stream stream = entity.GetOutputStream();
             HashAlgorithm hashAlgorithm = null;
@@ -168,7 +168,7 @@ namespace Net.Qiujuer.Blink
                 }
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 receiveRedundancy();
             }
@@ -179,7 +179,7 @@ namespace Net.Qiujuer.Blink
                 if (hashAlgorithm != null)
                 {
                     string md5String = BitConverter.ToString(hashAlgorithm.Hash).Replace("-", "");
-                    entity.SetHashCode(md5String);
+                    entity.SetHash(md5String);
                 }
             }
             return false;

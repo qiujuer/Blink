@@ -19,7 +19,7 @@ namespace Net.Qiujuer.Blink.Box
         public StringSendPacket(String entity, SendListener listener)
             : base(System.Text.Encoding.UTF8.GetBytes(entity), listener)
         {
-            mType = ReceiveParser.Type.STRING;
+            mType = Type.STRING;
         }
     }
 }

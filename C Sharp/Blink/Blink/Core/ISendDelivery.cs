@@ -4,7 +4,7 @@ namespace Net.Qiujuer.Blink.Core
     /// <summary>
     /// Send delivery interface
     /// </summary>
-    public interface SendDelivery
+    public interface ISendDelivery
     {
         /**
          * Parses a start response from the sender.

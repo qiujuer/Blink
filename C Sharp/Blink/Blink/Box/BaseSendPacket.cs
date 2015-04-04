@@ -1,11 +1,12 @@
-﻿using Net.Qiujuer.Blink.Listener;
+﻿using Net.Qiujuer.Blink.Core;
+using Net.Qiujuer.Blink.Listener;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Net.Qiujuer.Blink.Core
+namespace Net.Qiujuer.Blink.Box
 {
     public abstract class BaseSendPacket<T> : SendPacket
     {
@@ -17,7 +18,7 @@ namespace Net.Qiujuer.Blink.Core
             mEntity = entity;
         }
 
-        public override object GetEntity()
+        public T GetEntity()
         {
             return mEntity;
         }

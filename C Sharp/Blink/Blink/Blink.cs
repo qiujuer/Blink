@@ -1,6 +1,6 @@
 ﻿using Net.Qiujuer.Blink.Core;
 using Net.Qiujuer.Blink.Listener;
-using Net.Qiujuer.Blink.tool;
+using Net.Qiujuer.Blink.Tool;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,7 +38,7 @@ namespace Net.Qiujuer.Blink
         {
             String path = Path.Combine(resourcePath, DEFAULT_RESOURCE_DIR);
             DiskResource resource = new DiskResource(path, fileMark);
-            ReceiveParser parser = new ReceiveParser(resource);
+            BlinkParser parser = new BlinkParser(resource);
             SocketAdapter socketAdapter = new SocketAdapter(socket, socketBufferSize, parser);
             ExecutorDelivery delivery = new ExecutorDelivery(executor, listener);
             return new BlinkConn(socketAdapter, delivery, socketAdapter, delivery, resource);
@@ -120,9 +120,9 @@ namespace Net.Qiujuer.Blink
 
         class SingleExecutor : Executor
         {
-            public void execute(Runnable command)
+            public void Execute(Runnable command)
             {
-                command.run();
+                command.Run();
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using Net.Qiujuer.Blink.Box;
 using Net.Qiujuer.Blink.Listener;
+using Net.Qiujuer.Blink.Tool;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,24 +13,23 @@ namespace Net.Qiujuer.Blink.Core
     public class BlinkConn
     {
 
+        private readonly Queue<SendPacket> mSendQueue = new AutoQueue<SendPacket>();
 
-        private readonly Queue<SendPacket> mSendQueue = new Queue<SendPacket>();
+        private readonly ISender mSender;
 
-        private readonly Sender mSender;
+        private readonly ISendDelivery mSendDelivery;
 
-        private readonly SendDelivery mSendDelivery;
+        private readonly IReceiver mReceiver;
 
-        private readonly Receiver mReceiver;
+        private readonly IReceiveDelivery mReceiveDelivery;
 
-        private readonly ReceiveDelivery mReceiveDelivery;
-
-        private readonly Resource mResource;
+        private readonly IResource mResource;
 
         private SendDispatcher mSendDispatcher;
 
         private ReceiveDispatcher mReceiveDispatcher;
 
-        public BlinkConn(Sender sender, SendDelivery sendDelivery, Receiver receiver, ReceiveDelivery receiveDelivery, Resource resource)
+        public BlinkConn(ISender sender, ISendDelivery sendDelivery, IReceiver receiver, IReceiveDelivery receiveDelivery, IResource resource)
         {
             mSender = sender;
             mReceiver = receiver;
@@ -82,7 +82,7 @@ namespace Net.Qiujuer.Blink.Core
          *
          * @return Resource
          */
-        public Resource GetResource()
+        public IResource GetResource()
         {
             return mResource;
         }

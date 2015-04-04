@@ -1,17 +1,13 @@
 ﻿using Net.Qiujuer.Blink.Core;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink
 {
     /**
      * Disk resource implements Resource{@link Resource}
      */
-    public class DiskResource : Resource
+    public class DiskResource : IResource
     {
         /**
          * A unique identifier on the Resource clear
@@ -30,7 +26,8 @@ namespace Net.Qiujuer.Blink
             mRootDirectory = rootDirectory;
             mMark = mark;
 
-            if (Directory.Exists(mRootDirectory) == false)//如果不存在就创建file文件夹
+            // Create
+            if (Directory.Exists(mRootDirectory) == false)
             {
                 Directory.CreateDirectory(mRootDirectory);
             }
@@ -40,8 +37,7 @@ namespace Net.Qiujuer.Blink
 
         public String Create(long id)
         {
-            //UUID.randomUUID();
-            String path = String.Format("%1$s_%2$d", mRootDirectory, mMark, id);
+            String path = Path.Combine(mRootDirectory, String.Format("{0}_{1}", mMark, id));
             if (!File.Exists(path))
                 try
                 {
@@ -60,22 +56,30 @@ namespace Net.Qiujuer.Blink
 
         public void Clear()
         {
-            DirectoryInfo theFolder = new DirectoryInfo(mRootDirectory);
-            FileInfo[] fileInfo = theFolder.GetFiles();
-            //遍历文件夹
-            foreach (FileInfo f in fileInfo)
+            try
             {
-                if (f.Name.Contains(mMark))
-                    f.Delete();
+                DirectoryInfo theFolder = new DirectoryInfo(mRootDirectory);
+                FileInfo[] fileInfo = theFolder.GetFiles();
+                //遍历文件夹
+                foreach (FileInfo f in fileInfo)
+                {
+                    if (f.Name.Contains(mMark))
+                        f.Delete();
+                }
             }
+            catch (Exception) { }
 
-            //BlinkLog.d("Resource cleared with mark: " + mMark);
+            BlinkLog.V("Resource cleared with mark: " + mMark);
         }
 
         public void ClearAll()
         {
-            Directory.Delete(mRootDirectory, true);
-            //BlinkLog.d("Resource cleared path.",null);
+            try
+            {
+                Directory.Delete(mRootDirectory, true);
+            }
+            catch (Exception) { }
+            BlinkLog.V("Resource cleared path.");
         }
 
         public String GetMark()

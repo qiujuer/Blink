@@ -1,7 +1,6 @@
 ﻿using Net.Qiujuer.Blink.Box;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,14 +8,14 @@ using System.Threading.Tasks;
 namespace Net.Qiujuer.Blink.Core
 {
     /// <summary>
-    /// Blink receive packet parse
+    /// 
     /// </summary>
-    public class ReceiveParser
+    public class BlinkParser : IBlinkParser
     {
         private long mId = 0;
-        protected Resource mResource;
+        protected IResource mResource;
 
-        public ReceiveParser(Resource resource)
+        public BlinkParser(IResource resource)
         {
             mResource = resource;
         }
@@ -27,26 +26,19 @@ namespace Net.Qiujuer.Blink.Core
             ReceivePacket packet = null;
             switch (type)
             {
-                case Type.STRING:
+                case BlinkPacket.Type.STRING:
                     packet = new StringReceivePacket(id, type, len);
                     break;
-                case Type.BYTES:
+                case BlinkPacket.Type.BYTES:
                     packet = new ByteReceivePacket(id, type, len); ;
                     break;
-                case Type.FILE:
+                case BlinkPacket.Type.FILE:
                     String file = mResource.Create(id);
                     if (file != null)
                         packet = new FileReceivePacket(id, type, len, file);
                     break;
             }
             return packet;
-        }
-
-        public static class Type
-        {
-            public const int STRING = 0;
-            public const int BYTES = 1;
-            public const int FILE = 2;
         }
     }
 }

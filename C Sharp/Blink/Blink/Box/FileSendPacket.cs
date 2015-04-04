@@ -17,7 +17,7 @@ namespace Net.Qiujuer.Blink.Box
         }
 
         public FileSendPacket(FileInfo entity, SendListener listener)
-            : base(entity, ReceiveParser.Type.BYTES, listener)
+            : base(entity, Type.BYTES, listener)
         {
             mLength = (int)mEntity.Length;
         }

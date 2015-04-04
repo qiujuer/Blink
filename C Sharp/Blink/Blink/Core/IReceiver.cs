@@ -4,7 +4,7 @@ namespace Net.Qiujuer.Blink.Core
     /**
      * Receive entity interface
      */
-    public interface Receiver
+    public interface IReceiver
     {
         /**
      * Receive the entity's information
@@ -21,7 +21,7 @@ namespace Net.Qiujuer.Blink.Core
          * @param delivery ReceiveDelivery
          * @return ReceiveEntity
          */
-        bool ReceiveEntity(ReceivePacket entity, ReceiveDelivery delivery);
+        bool ReceiveEntity(ReceivePacket entity, IReceiveDelivery delivery);
 
         /**
          * Destroy the receive IO stream

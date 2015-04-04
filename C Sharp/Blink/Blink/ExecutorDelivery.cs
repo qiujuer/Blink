@@ -1,6 +1,6 @@
 ﻿using Net.Qiujuer.Blink.Core;
 using Net.Qiujuer.Blink.Listener;
-using Net.Qiujuer.Blink.tool;
+using Net.Qiujuer.Blink.Tool;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,48 +9,60 @@ using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink
 {
-    class ExecutorDelivery : ReceiveDelivery, SendDelivery
+    class ExecutorDelivery : IReceiveDelivery, ISendDelivery
     {
+        private readonly ReceiveListener mListener;
         private readonly Executor mPoster;
 
         public ExecutorDelivery(Executor executor, ReceiveListener listener)
-            : base(listener)
         {
             mPoster = executor;
+            mListener = listener;
         }
 
-        public override void PostReceiveStart(ReceivePacket entity)
+        public void PostReceiveStart(ReceivePacket entity)
         {
-            mPoster.execute(new ReceiveDeliveryRunnable(GetReceiveListener(), entity, null, false));
+            mPoster.Execute(new ReceiveDeliveryRunnable(GetReceiveListener(), entity, null, false));
         }
 
-        public override void PostReceiveEnd(ReceivePacket entity, bool isSuccess)
+        public void PostReceiveEnd(ReceivePacket entity, bool isSuccess)
         {
             entity.SetSuccess(isSuccess);
-            mPoster.execute(new ReceiveDeliveryRunnable(GetReceiveListener(), entity, null, true));
+            mPoster.Execute(new ReceiveDeliveryRunnable(GetReceiveListener(), entity, null, true));
         }
 
-        public override void PostReceiveProgress(ReceivePacket entity, int total, int cur)
+        public void PostReceiveProgress(ReceivePacket entity, int total, int cur)
         {
             ProgressStatus status = new ProgressStatus(total, cur);
-            mPoster.execute(new ReceiveDeliveryRunnable(GetReceiveListener(), entity, status, false));
+            mPoster.Execute(new ReceiveDeliveryRunnable(GetReceiveListener(), entity, status, false));
         }
 
         public void PostSendStart(SendPacket entity)
         {
-            mPoster.execute(new SendDeliveryRunnable(entity, null, false));
+            mPoster.Execute(new SendDeliveryRunnable(entity, null, false));
         }
 
         public void PostSendEnd(SendPacket entity, bool isSuccess)
         {
             entity.SetSuccess(isSuccess);
-            mPoster.execute(new SendDeliveryRunnable(entity, null, true));
+            mPoster.Execute(new SendDeliveryRunnable(entity, null, true));
         }
 
         public void PostSendProgress(SendPacket entity, int total, int cur)
         {
             ProgressStatus status = new ProgressStatus(total, cur);
-            mPoster.execute(new SendDeliveryRunnable(entity, status, false));
+            mPoster.Execute(new SendDeliveryRunnable(entity, status, false));
+        }
+
+
+        /**
+         * Get ReceiveListener
+         *
+         * @return ReceiveListener
+         */
+        protected ReceiveListener GetReceiveListener()
+        {
+            return mListener;
         }
 
         private class ReceiveDeliveryRunnable : Runnable
@@ -68,7 +80,7 @@ namespace Net.Qiujuer.Blink
                 this.isEnd = isEnd;
             }
 
-            public void run()
+            public void Run()
             {
                 if (listener != null)
                 {
@@ -100,7 +112,7 @@ namespace Net.Qiujuer.Blink
             }
 
 
-            public void run()
+            public void Run()
             {
                 if (!entity.IsCanceled())
                 {

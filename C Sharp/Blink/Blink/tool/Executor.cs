@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Net.Qiujuer.Blink.tool
+namespace Net.Qiujuer.Blink.Tool
 {
     public interface Executor
     {
-        void execute(Runnable command);
+        void Execute(Runnable command);
     }
 }

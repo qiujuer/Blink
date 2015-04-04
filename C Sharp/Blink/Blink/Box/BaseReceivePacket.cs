@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Net.Qiujuer.Blink.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Net.Qiujuer.Blink.Core
+namespace Net.Qiujuer.Blink.Box
 {
-    public abstract class BaseReceivePacket<T> : ReceivePacket where T : class
+    public abstract class BaseReceivePacket<T> : ReceivePacket
     {
         protected T mEntity;
 
@@ -15,7 +16,7 @@ namespace Net.Qiujuer.Blink.Core
         {
         }
 
-        public override object GetEntity()
+        public T GetEntity()
         {
             return mEntity;
         }

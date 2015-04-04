@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Net.Qiujuer.Blink.Tool;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,23 +12,23 @@ using System.Threading.Tasks;
  */
 namespace Net.Qiujuer.Blink.Core
 {
-    public class ReceiveDispatcher
+    public class ReceiveDispatcher : Runnable
     {
         /**
      * The sender interface for processing sender requests.
      */
-        private readonly Receiver mReceiver;
+        private readonly IReceiver mReceiver;
         /**
          * For posting receive responses.
          */
-        private readonly ReceiveDelivery mDelivery;
+        private readonly IReceiveDelivery mDelivery;
         /**
          * Used for telling us to die.
          */
         private volatile bool mQuit = false;
         private Thread mWork;
 
-        public ReceiveDispatcher(Receiver receiver, ReceiveDelivery delivery)
+        public ReceiveDispatcher(IReceiver receiver, IReceiveDelivery delivery)
         {
             mReceiver = receiver;
             mDelivery = delivery;

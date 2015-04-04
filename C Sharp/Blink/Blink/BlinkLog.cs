@@ -10,80 +10,49 @@ namespace Net.Qiujuer.Blink
     /**
  * Logging helper class.
  */
-    public class BlinkLog
+    public static class BlinkLog
     {
-        public static String TAG = "Blink";
         public static bool DEBUG = true;
-
-        public static void setTag(String tag)
-        {
-            TAG = tag;
-        }
 
         public static void setDebug(bool debug)
         {
             DEBUG = debug;
         }
 
-        public static void v(String format, Object[] args)
+        public static void I(String str)
         {
             if (DEBUG)
             {
-                Console.WriteLine(TAG + buildMessage(format, args));
+                Console.ResetColor();
+                Console.WriteLine("INFO:" + str);
             }
         }
 
-        public static void d(String format, Object[] args)
+        public static void V(String str)
         {
             if (DEBUG)
             {
-                Console.WriteLine(TAG + buildMessage(format, args));
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("VERBOSE:" + str);
             }
         }
 
-        public static void e(String format, Object[] args)
+        public static void W(String str)
         {
             if (DEBUG)
             {
-                Console.WriteLine(TAG + buildMessage(format, args));
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("WARN:" + str);
             }
         }
 
-        public static void e(Thread tr, String format, Object[] args)
+        public static void E(String str)
         {
             if (DEBUG)
             {
-                Console.WriteLine(TAG + tr.ToString()
-                        + buildMessage(format, args));
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("ERROR:" + str);
             }
-        }
-
-        public static void wtf(String format, Object[] args)
-        {
-            if (DEBUG)
-            {
-                Console.WriteLine(TAG + buildMessage(format, args));
-            }
-        }
-
-        public static void wtf(Thread tr, String format, Object[] args)
-        {
-            if (DEBUG)
-            {
-                Console.WriteLine(TAG + tr.ToString()
-                        + buildMessage(format, args));
-            }
-        }
-
-        /**
-         * Formats the caller's provided message and prepends useful info like
-         * calling thread ID and method name.
-         */
-        private static String buildMessage(String format, Object[] args)
-        {
-            String msg = (args == null) ? format : String.Format(format,
-                    args);
-            return msg;
         }
     }
 }

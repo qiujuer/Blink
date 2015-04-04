@@ -14,7 +14,7 @@ namespace Net.Qiujuer.Blink.Core
     {
         private readonly long mId;
         protected Stream mOutStream;
-        private String mHashCode;
+        private String mHash;
 
         public ReceivePacket(long id, int type, int len)
             : base(type)
@@ -33,14 +33,14 @@ namespace Net.Qiujuer.Blink.Core
             return mOutStream;
         }
 
-        public void SetHashCode(String hashCode)
+        public void SetHash(String hashCode)
         {
-            mHashCode = hashCode;
+            mHash = hashCode;
         }
 
-        public String GetHashCode()
+        public String GetHash()
         {
-            return mHashCode;
+            return mHash;
         }
 
         internal abstract void AdjustStream();

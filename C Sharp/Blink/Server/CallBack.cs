@@ -1,7 +1,7 @@
 ﻿using Net.Qiujuer.Blink.Box;
 using Net.Qiujuer.Blink.Core;
 using Net.Qiujuer.Blink.Listener;
-using Net.Qiujuer.Blink.tool;
+using Net.Qiujuer.Blink.Tool;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,9 +13,9 @@ namespace Sample
 {
     class CallBack : ReceiveListener, Executor
     {
-        public void execute(Runnable command)
+        public void Execute(Runnable command)
         {
-            command.run();
+            command.Run();
         }
 
         public void OnReceiveStart(int type, long id)
@@ -45,7 +45,7 @@ namespace Sample
                         + " "
                         + paket.GetLength()
                         + " :"
-                        + ((FileInfo)(((FileReceivePacket)paket).GetEntity()))
+                        + ((FileReceivePacket)paket).GetEntity()
                         .FullName + " " + paket.GetHashCode());
         }
     }
