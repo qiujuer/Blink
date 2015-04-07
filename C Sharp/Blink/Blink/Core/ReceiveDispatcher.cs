@@ -15,8 +15,8 @@ namespace Net.Qiujuer.Blink.Core
     public class ReceiveDispatcher : Runnable
     {
         /**
-     * The sender interface for processing sender requests.
-     */
+         * The sender interface for processing sender requests.
+         */
         private readonly IReceiver mReceiver;
         /**
          * For posting receive responses.
@@ -27,11 +27,13 @@ namespace Net.Qiujuer.Blink.Core
          */
         private volatile bool mQuit = false;
         private Thread mWork;
+        private BlinkConn mBlinkConn;
 
-        public ReceiveDispatcher(IReceiver receiver, IReceiveDelivery delivery)
+        public ReceiveDispatcher(IReceiver receiver, IReceiveDelivery delivery, BlinkConn blinkConn)
         {
             mReceiver = receiver;
             mDelivery = delivery;
+            mBlinkConn = blinkConn;
         }
 
         public void Start()
@@ -54,6 +56,7 @@ namespace Net.Qiujuer.Blink.Core
 
         public void Run()
         {
+            int err = 0;
             while (!mQuit)
             {
                 ReceivePacket packet;
@@ -61,11 +64,6 @@ namespace Net.Qiujuer.Blink.Core
                 {
                     // Receive head
                     packet = mReceiver.ReceiveHead();
-                    if (packet == null)
-                    {
-                        sleepSomeTime();
-                        continue;
-                    }
 
                     // Adjust Stream
                     packet.AdjustStream();
@@ -85,7 +83,12 @@ namespace Net.Qiujuer.Blink.Core
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    if (err > 3)
+                    {
+                        mBlinkConn.Send("dasds");
+                    }
+                    err++;
+                    BlinkLog.E(e.ToString());
                 }
                 finally
                 {

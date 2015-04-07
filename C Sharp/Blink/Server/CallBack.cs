@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Sample
 {
-    class CallBack : ReceiveListener, Executor
+    class CallBack : BlinkListener, Executor
     {
         public void Execute(Runnable command)
         {

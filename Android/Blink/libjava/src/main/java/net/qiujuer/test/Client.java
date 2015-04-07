@@ -53,7 +53,7 @@ public class Client {
             return;
 
         System.out.println("Test Send String...");
-        for (int i = 0; i <= 10; i++) {
+        for (int i = 0; i <= 1; i++) {
             conn.send("Test String:" + i);
             try {
                 Thread.sleep(1000);

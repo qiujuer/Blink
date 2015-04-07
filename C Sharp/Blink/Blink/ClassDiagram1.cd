@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Net.Qiujuer.Blink.Blink" Collapsed="true">
+    <Position X="13.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAEAAAAAACAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Blink.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.BlinkLog" Collapsed="true">
+    <Position X="17.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAACAiAYAAA=</HashCode>
+      <FileName>BlinkLog.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.DiskResource" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="13.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIBAAAAgAAAAgAAAAEAAAAAAAABAAAA=</HashCode>
+      <FileName>DiskResource.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.ExecutorDelivery" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="15.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAmAAAAAAAAAAAAAAAAAAAAACAEAACAAkQ=</HashCode>
+      <FileName>ExecutorDelivery.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.SocketAdapter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="13.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAgAAAgBEAAAMAAAAAACEBAAAAAEAAAAAAAAACAE=</HashCode>
+      <FileName>SocketAdapter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Box.BaseReceivePacket&lt;T&gt;" Collapsed="true">
+    <Position X="2.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Box\BaseReceivePacket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Box.BaseSendPacket&lt;T&gt;" Collapsed="true">
+    <Position X="8.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Box\BaseSendPacket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Box.ByteReceivePacket" Collapsed="true">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Box\ByteReceivePacket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Box.ByteSendPacket" Collapsed="true">
+    <Position X="7.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Box\ByteSendPacket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Box.FileReceivePacket" Collapsed="true">
+    <Position X="2.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Box\FileReceivePacket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Box.FileSendPacket" Collapsed="true">
+    <Position X="9.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Box\FileSendPacket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Box.StringReceivePacket" Collapsed="true">
+    <Position X="5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Box\StringReceivePacket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Box.StringSendPacket" Collapsed="true">
+    <Position X="7.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Box\StringSendPacket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Core.BlinkConn" Collapsed="true">
+    <Position X="15.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAEAAQAAAIAAAAEAIAAAAAABAAAAAAABDCABAAQA=</HashCode>
+      <FileName>Core\BlinkConn.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Core.BlinkPacket" Collapsed="true">
+    <Position X="5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABAAQABAAAAAAAAEAIAAAIAAAEAA=</HashCode>
+      <FileName>Core\BlinkPacket.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Core.BlinkParser" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="12" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAA=</HashCode>
+      <FileName>Core\BlinkParser.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Core.ReceiveDispatcher" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAACABAAAAAgAAAAAAAAAAADAAAAAAQI=</HashCode>
+      <FileName>Core\ReceiveDispatcher.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Core.ReceivePacket" Collapsed="true">
+    <Position X="2.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAAAAAAAAAQAEAAAgAAACAIAQAAIQAAA=</HashCode>
+      <FileName>Core\ReceivePacket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Core.SendDispatcher" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="12" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAACAAAAAAAgAAAAAAAAAAACAAABAAQI=</HashCode>
+      <FileName>Core\SendDispatcher.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Core.SendPacket" Collapsed="true">
+    <Position X="8.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAQABAAAAgEABEAAAABAAAAAAAACBABAAAAUA=</HashCode>
+      <FileName>Core\SendPacket.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Net.Qiujuer.Blink.Tool.AutoQueue&lt;T&gt;" Collapsed="true">
+    <Position X="12" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAABAAAA=</HashCode>
+      <FileName>Tool\AutoQueue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Net.Qiujuer.Blink.Core.IBlinkPacket" Collapsed="true">
+    <Position X="15.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAAAEAIAAAAAAAEAA=</HashCode>
+      <FileName>Core\IBlinkPacket.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Net.Qiujuer.Blink.Core.IBlinkParser" Collapsed="true">
+    <Position X="17.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Core\IBlinkParser.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Net.Qiujuer.Blink.Core.IReceiveDelivery" Collapsed="true">
+    <Position X="12" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgQ=</HashCode>
+      <FileName>Core\IReceiveDelivery.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Net.Qiujuer.Blink.Core.IReceiver" Collapsed="true">
+    <Position X="13.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAAAAEAAAAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>Core\IReceiver.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Net.Qiujuer.Blink.Core.IResource" Collapsed="true">
+    <Position X="15.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIBAAAAAAAAAAAAAAEAAAAAAAABAAAA=</HashCode>
+      <FileName>Core\IResource.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Net.Qiujuer.Blink.Core.ISendDelivery" Collapsed="true">
+    <Position X="17.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAkAAAAAAAAAAAAAAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>Core\ISendDelivery.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Net.Qiujuer.Blink.Core.ISender" Collapsed="true">
+    <Position X="12" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAMAAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\ISender.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Net.Qiujuer.Blink.Listener.BlinkListener" Collapsed="true">
+    <Position X="12" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAAAIAAAAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>Listener\BlinkListener.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Net.Qiujuer.Blink.Listener.SendListener" Collapsed="true">
+    <Position X="15.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAACCAAAAAAAAAAA=</HashCode>
+      <FileName>Listener\SendListener.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Net.Qiujuer.Blink.Tool.Executor" Collapsed="true">
+    <Position X="13.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Tool\Executor.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Net.Qiujuer.Blink.Tool.Runnable" Collapsed="true">
+    <Position X="13.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>Tool\Runnable.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

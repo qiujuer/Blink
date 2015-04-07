@@ -107,27 +107,20 @@ namespace Net.Qiujuer.Blink
 
         public ReceivePacket ReceiveHead()
         {
-            try
+            byte[] bytes = new byte[4];
+            if (mSocket.Receive(bytes, 1, SocketFlags.None) == 1)
             {
-                byte[] bytes = new byte[4];
-                if (mSocket.Receive(bytes, 1, SocketFlags.None) == 1)
+                int type = bytes[0];
+                if (type != -1)
                 {
-                    int type = bytes[0];
-                    if (type != -1)
-                    {
-                        byte[] lenByte = new byte[4];
-                        mSocket.Receive(lenByte);
-                        int len = BitConverter.ToInt32(lenByte, 0);
-                        ReceivePacket entity = mParser.ParseReceive(type, len);
-                        if (entity == null)
-                            receiveRedundancy();
-                        return entity;
-                    }
+                    byte[] lenByte = new byte[4];
+                    mSocket.Receive(lenByte);
+                    int len = BitConverter.ToInt32(lenByte, 0);
+                    ReceivePacket entity = mParser.ParseReceive(type, len);
+                    if (entity == null)
+                        receiveRedundancy();
+                    return entity;
                 }
-            }
-            catch (IOException)
-            {
-                return null;
             }
             return null;
         }

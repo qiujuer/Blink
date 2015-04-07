@@ -13,7 +13,7 @@ namespace Net.Qiujuer.Blink.Core
         /**
          * The queue of send entity.
          */
-        private readonly Queue<SendPacket> mQueue;
+        private readonly AutoQueue<SendPacket> mQueue;
         /**
          * The sender interface for processing sender requests.
          */
@@ -28,7 +28,7 @@ namespace Net.Qiujuer.Blink.Core
         private volatile bool mQuit = false;
         private Thread mWork;
 
-        public SendDispatcher(Queue<SendPacket> queue,
+        public SendDispatcher(AutoQueue<SendPacket> queue,
                               ISender sender, ISendDelivery delivery)
         {
             mQueue = queue;

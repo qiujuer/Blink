@@ -13,7 +13,7 @@ namespace Net.Qiujuer.Blink.Core
     public class BlinkConn
     {
 
-        private readonly Queue<SendPacket> mSendQueue = new AutoQueue<SendPacket>();
+        private readonly AutoQueue<SendPacket> mSendQueue = new AutoQueue<SendPacket>();
 
         private readonly ISender mSender;
 
@@ -51,7 +51,7 @@ namespace Net.Qiujuer.Blink.Core
             mSendDispatcher = new SendDispatcher(mSendQueue, mSender, mSendDelivery);
             mSendDispatcher.Start();
 
-            mReceiveDispatcher = new ReceiveDispatcher(mReceiver, mReceiveDelivery);
+            mReceiveDispatcher = new ReceiveDispatcher(mReceiver, mReceiveDelivery, this);
             mReceiveDispatcher.Start();
         }
 

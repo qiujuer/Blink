@@ -11,10 +11,10 @@ namespace Net.Qiujuer.Blink
 {
     class ExecutorDelivery : IReceiveDelivery, ISendDelivery
     {
-        private readonly ReceiveListener mListener;
+        private readonly BlinkListener mListener;
         private readonly Executor mPoster;
 
-        public ExecutorDelivery(Executor executor, ReceiveListener listener)
+        public ExecutorDelivery(Executor executor, BlinkListener listener)
         {
             mPoster = executor;
             mListener = listener;
@@ -60,19 +60,19 @@ namespace Net.Qiujuer.Blink
          *
          * @return ReceiveListener
          */
-        protected ReceiveListener GetReceiveListener()
+        protected BlinkListener GetReceiveListener()
         {
             return mListener;
         }
 
         private class ReceiveDeliveryRunnable : Runnable
         {
-            private ReceiveListener listener;
+            private BlinkListener listener;
             private ReceivePacket entity;
             private ProgressStatus status;
             private bool isEnd;
 
-            public ReceiveDeliveryRunnable(ReceiveListener listener, ReceivePacket entity, ProgressStatus status, bool isEnd)
+            public ReceiveDeliveryRunnable(BlinkListener listener, ReceivePacket entity, ProgressStatus status, bool isEnd)
             {
                 this.listener = listener;
                 this.entity = entity;
