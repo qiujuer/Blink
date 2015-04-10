@@ -11,25 +11,21 @@ using System.Threading.Tasks;
 
 namespace Sample
 {
-    class CallBack : BlinkListener, Executor
+    class CallBack : BlinkListener
     {
-        public void Execute(Runnable command)
-        {
-            command.Run();
-        }
 
         public void OnReceiveStart(int type, long id)
         {
             Console.WriteLine("Receive->start:" + type + " " + id);
         }
 
-        public void OnReceiveProgress(int type, long id, int total, int cur)
+        public void OnReceiveProgress(ReceivePacket paket, float progress)
         {
-            Console.WriteLine("Receive->progress:" + type + " " + id
-                         + " " + total + " " + cur);
+            Console.WriteLine("Receive->progress:" + paket.GetType() + " " + paket.GetId()
+                         + " " + paket.GetLength() + " " + progress);
         }
 
-        public void OnReceiveEnd(Net.Qiujuer.Blink.Core.ReceivePacket paket)
+        public void OnReceiveEnd(ReceivePacket paket)
         {
             if (paket.GetType() == BlinkPacket.Type.STRING)
                 Console.WriteLine("Receive->end: String:"

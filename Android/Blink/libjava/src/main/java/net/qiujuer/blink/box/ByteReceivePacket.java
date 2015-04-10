@@ -35,7 +35,7 @@ public class ByteReceivePacket extends ReceivePacket<byte[]> {
 
     @Override
     protected void adjustStream() {
-        mOutStream = new ByteArrayOutputStream(getLength());
+        mOutStream = new ByteArrayOutputStream((int)getLength());
     }
 
     @Override

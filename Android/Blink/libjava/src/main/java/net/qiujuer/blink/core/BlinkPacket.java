@@ -24,7 +24,7 @@ package net.qiujuer.blink.core;
  */
 public abstract class BlinkPacket<T> extends EntityNode<T> implements HeadNode {
     protected int mType;
-    protected int mLength;
+    protected long mLength;
     private boolean mSucceed;
 
     public BlinkPacket(int type) {
@@ -37,7 +37,7 @@ public abstract class BlinkPacket<T> extends EntityNode<T> implements HeadNode {
     }
 
     @Override
-    public int getLength() {
+    public long getLength() {
         return mLength;
     }
 

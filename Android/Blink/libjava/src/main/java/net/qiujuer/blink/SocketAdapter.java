@@ -77,10 +77,10 @@ public class SocketAdapter implements Sender, Receiver {
         try {
             int type = mIn.read();
             if (type != -1) {
-                byte[] lenByte = new byte[4];
+                byte[] lenByte = new byte[8];
                 mIn.read(lenByte);
-                int len = convertToInt(lenByte);
-                ReceivePacket<?> entity = mParser.parseReceive(type, len);
+                long len = convertToLong(lenByte);
+                ReceivePacket<?> entity = mParser.parseReceive(type, (int)len);
                 if (entity == null)
                     receiveRedundancy();
                 return entity;
@@ -103,7 +103,7 @@ public class SocketAdapter implements Sender, Receiver {
                                  ReceiveDelivery delivery) {
         OutputStream out = entity.getOutputStream();
         MessageDigest md5Verification = null;
-        int surplusLen = entity.getLength();
+        long surplusLen = entity.getLength();
         int cursor = 0;
         try {
             md5Verification = MessageDigest.getInstance("MD5");
@@ -113,7 +113,7 @@ public class SocketAdapter implements Sender, Receiver {
                 if (surplusLen > mBufferSize)
                     readLen = mIn.read(mInBuffer);
                 else
-                    readLen = mIn.read(mInBuffer, 0, surplusLen);
+                    readLen = mIn.read(mInBuffer, 0, (int)surplusLen);
 
                 // Write
                 out.write(mInBuffer, 0, readLen);
@@ -125,7 +125,7 @@ public class SocketAdapter implements Sender, Receiver {
                 cursor += readLen;
 
                 // Post progress
-                delivery.postReceiveProgress(entity, entity.getLength(), cursor);
+                delivery.postReceiveProgress(entity, (int)entity.getLength(), cursor);
             }
             return true;
         } catch (Exception e) {
@@ -161,7 +161,7 @@ public class SocketAdapter implements Sender, Receiver {
      */
     @Override
     public boolean sendHead(SendPacket entity) {
-        int length = entity.getLength();
+        long length = entity.getLength();
         if (length <= 0)
             return false;
         try {
@@ -169,7 +169,7 @@ public class SocketAdapter implements Sender, Receiver {
             // Send Type
             mOut.write(entity.getType());
             // Send Length
-            mOut.write(lenBytes, 0, 4);
+            mOut.write(lenBytes, 0, 8);
             return true;
         } catch (Exception e) {
             return false;
@@ -186,7 +186,7 @@ public class SocketAdapter implements Sender, Receiver {
     @Override
     public boolean sendEntity(SendPacket entity, SendDelivery delivery) {
         int cursor = 0;
-        int total = entity.getLength();
+        long total = entity.getLength();
         InputStream in = entity.getInputStream();
         int count;
         try {
@@ -196,7 +196,7 @@ public class SocketAdapter implements Sender, Receiver {
                 cursor += count;
 
                 // Post progress
-                delivery.postSendProgress(entity, total, cursor);
+                delivery.postSendProgress(entity, (int)total, cursor);
             }
             return true;
         } catch (IOException e) {
@@ -304,7 +304,7 @@ public class SocketAdapter implements Sender, Receiver {
         return n;
     }
 
-    static byte[] writeLong(long n) {
+    static byte[] convertToBytes(long n) {
         byte[] bytes = new byte[8];
         bytes[0] = ((byte) (n));
         bytes[1] = ((byte) (n >>> 8));
@@ -317,7 +317,7 @@ public class SocketAdapter implements Sender, Receiver {
         return bytes;
     }
 
-    static long readLong(byte[] bytes) {
+    static long convertToLong(byte[] bytes) {
         long n = 0;
         n |= ((bytes[0] & 0xFFL));
         n |= ((bytes[1] & 0xFFL) << 8);

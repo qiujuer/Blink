@@ -7,7 +7,7 @@ namespace Net.Qiujuer.Blink.Core
     public abstract class BlinkPacket : IBlinkPacket
     {
         protected int mType;
-        protected int mLength;
+        protected long mLength;
         private bool mSucceed;
 
         public BlinkPacket(int type)
@@ -20,7 +20,7 @@ namespace Net.Qiujuer.Blink.Core
             return mType;
         }
 
-        public int GetLength()
+        public long GetLength()
         {
             return mLength;
         }

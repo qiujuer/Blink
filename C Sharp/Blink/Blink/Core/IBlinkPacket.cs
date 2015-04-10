@@ -8,7 +8,7 @@ namespace Net.Qiujuer.Blink.Core
     {
         int GetType();
 
-        int GetLength();
+        long GetLength();
 
         void SetSuccess(bool isSuccess);
 

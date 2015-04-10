@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink.Core
 {
-    public interface ISender
+    public interface ISender : IDisposable
     {
         /**
-     * Send the entity's information
-     *
-     * @param entity SendEntity
-     * @return Status
-     */
+         * Send the entity's information
+         *
+         * @param entity SendEntity
+         * @return Status
+         */
         bool SendHead(SendPacket entity);
 
         /**
@@ -23,10 +23,5 @@ namespace Net.Qiujuer.Blink.Core
          * @return Status
          */
         bool SendEntity(SendPacket entity, ISendDelivery delivery);
-
-        /**
-         * Destroy the sender IO stream
-         */
-        void DestroySendIO();
     }
 }

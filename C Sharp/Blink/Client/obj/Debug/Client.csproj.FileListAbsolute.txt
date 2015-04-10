@@ -3,3 +3,4 @@ D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Client\bin\Debug\Client.exe
 D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Client\bin\Debug\Client.pdb
 D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Client\obj\Debug\Client.exe
 D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Client\obj\Debug\Client.pdb
+D:\Documents\LocalRepo\GitHub\Blink\C Sharp\Blink\Client\obj\Debug\Client.csprojResolveAssemblyReference.cache

@@ -21,6 +21,6 @@ namespace Net.Qiujuer.Blink.Core
         /**
          * Parses a progress response from the receiver.
          */
-        void PostReceiveProgress(ReceivePacket entity, int total, int cur);
+        void PostReceiveProgress(ReceivePacket entity, float progress);
     }
 }

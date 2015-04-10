@@ -18,7 +18,7 @@ namespace Sample
         {
             // Create a async thread to callback listener
             CallBack callback = new CallBack();
-            return Blink.newConnection(socket, 4 * 1024 * 1024, "D:/Blink/", new Guid().ToString(), callback, callback);
+            return Blink.newConnection(socket, 4 * 1024 * 1024, "D:/Blink/", Guid.NewGuid().ToString(), callback);
         }
     }
 }

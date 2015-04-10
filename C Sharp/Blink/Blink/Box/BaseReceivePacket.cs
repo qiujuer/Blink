@@ -11,7 +11,7 @@ namespace Net.Qiujuer.Blink.Box
     {
         protected T mEntity;
 
-        public BaseReceivePacket(long id, int type, int len)
+        public BaseReceivePacket(long id, int type, long len)
             : base(id, type, len)
         {
         }

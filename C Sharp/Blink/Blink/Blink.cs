@@ -29,18 +29,17 @@ namespace Net.Qiujuer.Blink
          * @param socketBufferSize Socket BufferSize
          * @param resourcePath     File Resource Path
          * @param fileMark         File name mark to clear
-         * @param executor         Executor to notify callback
          * @param listener         ReceiveListener
          * @return BlinkConn
          * @throws Exception
          */
-        public static BlinkConn newConnection(Socket socket, int socketBufferSize, String resourcePath, String fileMark, Executor executor, BlinkListener listener)
+        public static BlinkConn newConnection(Socket socket, int socketBufferSize, String resourcePath, String fileMark, BlinkListener listener)
         {
             String path = Path.Combine(resourcePath, DEFAULT_RESOURCE_DIR);
             DiskResource resource = new DiskResource(path, fileMark);
             BlinkParser parser = new BlinkParser(resource);
             SocketAdapter socketAdapter = new SocketAdapter(socket, socketBufferSize, parser);
-            ExecutorDelivery delivery = new ExecutorDelivery(executor, listener);
+            ExecutorDelivery delivery = new ExecutorDelivery(listener);
             return new BlinkConn(socketAdapter, delivery, socketAdapter, delivery, resource);
         }
 
@@ -50,14 +49,13 @@ namespace Net.Qiujuer.Blink
          * @param socket       Socket
          * @param resourcePath File Resource Path
          * @param fileMark     File name mark to clear
-         * @param executor     Executor to notify callback
          * @param listener     ReceiveListener
          * @return BlinkConn
          * @throws Exception
          */
         public static BlinkConn newConnection(Socket socket, String resourcePath, String fileMark, Executor executor, BlinkListener listener)
         {
-            return newConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, resourcePath, fileMark, executor, listener);
+            return newConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, resourcePath, fileMark, listener);
         }
 
         /**
@@ -66,14 +64,13 @@ namespace Net.Qiujuer.Blink
          * @param socket           Socket
          * @param socketBufferSize Socket BufferSize
          * @param resourcePath     File Resource Path
-         * @param executor         Executor to notify callback
          * @param listener         ReceiveListener
          * @return BlinkConn
          * @throws Exception
          */
         public static BlinkConn newConnection(Socket socket, int socketBufferSize, String resourcePath, Executor executor, BlinkListener listener)
         {
-            return newConnection(socket, socketBufferSize, resourcePath, new Guid().ToString(), executor, listener);
+            return newConnection(socket, socketBufferSize, resourcePath, Guid.NewGuid().ToString(), listener);
         }
 
         /**
@@ -81,32 +78,17 @@ namespace Net.Qiujuer.Blink
          *
          * @param socket       Socket
          * @param resourcePath File Resource Path
-         * @param executor     Executor to notify callback
          * @param listener     ReceiveListener
          * @return BlinkConn
          * @throws Exception
          */
-        public static BlinkConn newConnection(Socket socket, String resourcePath, Executor executor, BlinkListener listener)
+        public static BlinkConn newConnection(Socket socket, String resourcePath, BlinkListener listener)
         {
-            return newConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, resourcePath, new Guid().ToString(), executor, listener);
+            return newConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, resourcePath, Guid.NewGuid().ToString(), listener);
         }
 
         /**
          * Create a Bink connection by socket
-         *
-         * @param socket   Socket
-         * @param executor Executor to notify callback
-         * @param listener ReceiveListener
-         * @return BlinkConn
-         * @throws Exception
-         */
-        public static BlinkConn newConnection(Socket socket, Executor executor, BlinkListener listener)
-        {
-            return newConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, getDefaultResourcePath(), new Guid().ToString(), executor, listener);
-        }
-
-        /**
-         * Create a Bink connection by socket with SingleThreadExecutor callback
          *
          * @param socket   Socket
          * @param listener ReceiveListener
@@ -115,7 +97,7 @@ namespace Net.Qiujuer.Blink
          */
         public static BlinkConn newConnection(Socket socket, BlinkListener listener)
         {
-            return newConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, getDefaultResourcePath(), new Guid().ToString(), new SingleExecutor(), listener);
+            return newConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, getDefaultResourcePath(), Guid.NewGuid().ToString(), listener);
         }
 
         class SingleExecutor : Executor

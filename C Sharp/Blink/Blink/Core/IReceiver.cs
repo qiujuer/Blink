@@ -1,16 +1,17 @@
 ﻿
+using System;
 namespace Net.Qiujuer.Blink.Core
 {
     /**
      * Receive entity interface
      */
-    public interface IReceiver
+    public interface IReceiver : IDisposable
     {
         /**
-     * Receive the entity's information
-     *
-     * @return ReceiveEntity
-     */
+         * Receive the entity's information
+         *
+         * @return ReceiveEntity
+         */
         ReceivePacket ReceiveHead();
 
 
@@ -23,9 +24,5 @@ namespace Net.Qiujuer.Blink.Core
          */
         bool ReceiveEntity(ReceivePacket entity, IReceiveDelivery delivery);
 
-        /**
-         * Destroy the receive IO stream
-         */
-        void DestroyReceiveIO();
     }
 }

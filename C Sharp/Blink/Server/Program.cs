@@ -29,8 +29,6 @@ namespace Sample
                 BlinkLog.I("Start Server Socket...");
                 mServer.Bind(iep);
                 mServer.Listen(26);
-
-
                 mThread = new Thread(Run);
                 mThread.Start();
 

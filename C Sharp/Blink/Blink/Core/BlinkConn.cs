@@ -64,10 +64,10 @@ namespace Net.Qiujuer.Blink.Core
                 mResource.Clear();
 
             if (mSender != null)
-                mSender.DestroySendIO();
+                mSender.Dispose();
 
             if (mReceiver != null)
-                mReceiver.DestroyReceiveIO();
+                mReceiver.Dispose();
 
             if (mSendDispatcher != null)
                 mSendDispatcher.Quit();

@@ -11,47 +11,58 @@ namespace Net.Qiujuer.Blink
 {
     class ExecutorDelivery : IReceiveDelivery, ISendDelivery
     {
-        private readonly BlinkListener mListener;
-        private readonly Executor mPoster;
+        private event EventHandler<Runnable> mBlinkPoster;
+        private event EventHandler<Runnable> mSendPoster;
+        private readonly BlinkListener mBlinkListener;
 
-        public ExecutorDelivery(Executor executor, BlinkListener listener)
+        public ExecutorDelivery(BlinkListener listener)
         {
-            mPoster = executor;
-            mListener = listener;
+            mBlinkPoster += ExecutorDelivery_BlinkPoster;
+            mSendPoster += ExecutorDelivery_SendPoster;
+
+            mBlinkListener = listener;
+        }
+
+        void ExecutorDelivery_SendPoster(object sender, Runnable e)
+        {
+            e.Run();
+        }
+
+        void ExecutorDelivery_BlinkPoster(object sender, Runnable e)
+        {
+            e.Run();
         }
 
         public void PostReceiveStart(ReceivePacket entity)
         {
-            mPoster.Execute(new ReceiveDeliveryRunnable(GetReceiveListener(), entity, null, false));
+            mBlinkPoster.BeginInvoke(null, new ReceiveDeliveryRunnable(GetBlinkListener(), entity, 0, false), null, null);
         }
 
         public void PostReceiveEnd(ReceivePacket entity, bool isSuccess)
         {
             entity.SetSuccess(isSuccess);
-            mPoster.Execute(new ReceiveDeliveryRunnable(GetReceiveListener(), entity, null, true));
+            mBlinkPoster.BeginInvoke(null, new ReceiveDeliveryRunnable(GetBlinkListener(), entity, 0, true), null, null);
         }
 
-        public void PostReceiveProgress(ReceivePacket entity, int total, int cur)
+        public void PostReceiveProgress(ReceivePacket entity, float progress)
         {
-            ProgressStatus status = new ProgressStatus(total, cur);
-            mPoster.Execute(new ReceiveDeliveryRunnable(GetReceiveListener(), entity, status, false));
+            mBlinkPoster.BeginInvoke(null, new ReceiveDeliveryRunnable(GetBlinkListener(), entity, progress, false), null, null);
         }
 
         public void PostSendStart(SendPacket entity)
         {
-            mPoster.Execute(new SendDeliveryRunnable(entity, null, false));
+            mSendPoster.BeginInvoke(null, new SendDeliveryRunnable(entity, 0, false), null, null);
         }
 
         public void PostSendEnd(SendPacket entity, bool isSuccess)
         {
             entity.SetSuccess(isSuccess);
-            mPoster.Execute(new SendDeliveryRunnable(entity, null, true));
+            mSendPoster.BeginInvoke(null, new SendDeliveryRunnable(entity, 0, true), null, null);
         }
 
-        public void PostSendProgress(SendPacket entity, int total, int cur)
+        public void PostSendProgress(SendPacket entity, float progress)
         {
-            ProgressStatus status = new ProgressStatus(total, cur);
-            mPoster.Execute(new SendDeliveryRunnable(entity, status, false));
+            mSendPoster.BeginInvoke(null, new SendDeliveryRunnable(entity, progress, false), null, null);
         }
 
 
@@ -60,23 +71,23 @@ namespace Net.Qiujuer.Blink
          *
          * @return ReceiveListener
          */
-        protected BlinkListener GetReceiveListener()
+        protected BlinkListener GetBlinkListener()
         {
-            return mListener;
+            return mBlinkListener;
         }
 
         private class ReceiveDeliveryRunnable : Runnable
         {
             private BlinkListener listener;
             private ReceivePacket entity;
-            private ProgressStatus status;
+            private float progress;
             private bool isEnd;
 
-            public ReceiveDeliveryRunnable(BlinkListener listener, ReceivePacket entity, ProgressStatus status, bool isEnd)
+            public ReceiveDeliveryRunnable(BlinkListener listener, ReceivePacket entity, float progress, bool isEnd)
             {
                 this.listener = listener;
                 this.entity = entity;
-                this.status = status;
+                this.progress = progress;
                 this.isEnd = isEnd;
             }
 
@@ -84,15 +95,14 @@ namespace Net.Qiujuer.Blink
             {
                 if (listener != null)
                 {
-                    if (status != null)
-                        listener.OnReceiveProgress(entity.GetType(), entity.GetId(), status.total, status.cur);
+                    if (progress > 0)
+                        listener.OnReceiveProgress(entity, progress);
                     else if (isEnd)
                         listener.OnReceiveEnd(entity);
                     else
                         listener.OnReceiveStart(entity.GetType(), entity.GetId());
                 }
                 entity = null;
-                status = null;
                 listener = null;
             }
         }
@@ -101,13 +111,13 @@ namespace Net.Qiujuer.Blink
         private class SendDeliveryRunnable : Runnable
         {
             private SendPacket entity;
-            private ProgressStatus status;
+            private float progress;
             private bool isEnd;
 
-            public SendDeliveryRunnable(SendPacket entity, ProgressStatus status, bool isEnd)
+            public SendDeliveryRunnable(SendPacket entity, float progress, bool isEnd)
             {
                 this.entity = entity;
-                this.status = status;
+                this.progress = progress;
                 this.isEnd = isEnd;
             }
 
@@ -116,8 +126,8 @@ namespace Net.Qiujuer.Blink
             {
                 if (!entity.IsCanceled())
                 {
-                    if (status != null)
-                        entity.DeliverProgress(status.total, status.cur);
+                    if (progress > 0)
+                        entity.DeliverProgress(progress);
                     else if (isEnd)
                         entity.DeliverEnd();
                     else
@@ -125,22 +135,6 @@ namespace Net.Qiujuer.Blink
                 }
 
                 entity = null;
-                status = null;
-            }
-        }
-
-        /**
-         * Send progress status
-         */
-        private class ProgressStatus
-        {
-            internal int total;
-            internal int cur;
-
-            internal ProgressStatus(int total, int cur)
-            {
-                this.total = total;
-                this.cur = cur;
             }
         }
     }

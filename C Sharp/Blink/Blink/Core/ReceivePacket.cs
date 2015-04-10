@@ -16,7 +16,7 @@ namespace Net.Qiujuer.Blink.Core
         protected Stream mOutStream;
         private String mHash;
 
-        public ReceivePacket(long id, int type, int len)
+        public ReceivePacket(long id, int type, long len)
             : base(type)
         {
             mId = id;

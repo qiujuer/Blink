@@ -34,7 +34,7 @@ public class StringReceivePacket extends ReceivePacket<String> {
 
     @Override
     protected void adjustStream() {
-        mOutStream = new ByteArrayOutputStream(getLength());
+        mOutStream = new ByteArrayOutputStream((int)getLength());
     }
 
     @Override

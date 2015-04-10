@@ -10,7 +10,7 @@ namespace Net.Qiujuer.Blink.Box
 {
     public class FileReceivePacket : BaseReceivePacket<FileInfo>
     {
-        public FileReceivePacket(long id, int type, int len, String path)
+        public FileReceivePacket(long id, int type, long len, String path)
             : base(id, type, len)
         {
             mEntity = new FileInfo(path);

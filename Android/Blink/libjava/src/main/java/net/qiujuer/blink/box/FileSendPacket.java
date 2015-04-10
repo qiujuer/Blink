@@ -50,7 +50,7 @@ public class FileSendPacket extends SendPacket<File> {
     }
 
     @Override
-    public int getLength() {
-        return (int) mEntity.length();
+    public long getLength() {
+        return mEntity.length();
     }
 }

@@ -8,7 +8,7 @@ namespace Net.Qiujuer.Blink.Listener
     {
         void OnSendStart();
 
-        void OnSendProgress(int total, int cur);
+        void OnSendProgress(float progress);
 
         void OnSendEnd(bool isSuccess);
     }

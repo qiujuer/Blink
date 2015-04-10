@@ -20,7 +20,7 @@ namespace Net.Qiujuer.Blink.Core
             mResource = resource;
         }
 
-        public ReceivePacket ParseReceive(int type, int len)
+        public ReceivePacket ParseReceive(int type, long len)
         {
             long id = ++mId;
             ReceivePacket packet = null;

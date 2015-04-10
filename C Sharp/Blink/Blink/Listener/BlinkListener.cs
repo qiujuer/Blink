@@ -10,7 +10,7 @@ namespace Net.Qiujuer.Blink.Listener
     {
         void OnReceiveStart(int type, long id);
 
-        void OnReceiveProgress(int type, long id, int total, int cur);
+        void OnReceiveProgress(ReceivePacket paket, float progress);
 
         void OnReceiveEnd(ReceivePacket paket);
 

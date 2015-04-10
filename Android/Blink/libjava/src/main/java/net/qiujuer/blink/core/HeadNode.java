@@ -25,5 +25,5 @@ package net.qiujuer.blink.core;
 public interface HeadNode {
     int getType();
 
-    int getLength();
+    long getLength();
 }

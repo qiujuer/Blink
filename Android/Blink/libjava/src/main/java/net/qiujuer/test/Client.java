@@ -66,7 +66,7 @@ public class Client {
         conn.send(new byte[]{1, 1, 0, 0});
 
         System.out.println("Test File...");
-        conn.send(new File("F:/TDDOWNLOAD/250315GT_AS.zip"));
+        conn.send(new File("F:/TDDOWNLOAD/Game/DevilMayCry4.7z"));
 
         System.out.println("Send End.");
     }

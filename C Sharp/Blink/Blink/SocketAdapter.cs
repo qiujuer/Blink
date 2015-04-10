@@ -36,29 +36,29 @@ namespace Net.Qiujuer.Blink
 
         public bool SendHead(SendPacket entity)
         {
-            int length = entity.GetLength();
-            if (length <= 0)
+            IList<ArraySegment<byte>> head = entity.GetHeadInfo();
+            if (head == null)
                 return false;
-            try
+            else
             {
-                byte[] lenBytes = BitConverter.GetBytes((length));
-                // Send Type
-                mSocket.Send(new byte[] { (byte)entity.GetType() }, SocketFlags.None);
-                // Send Length
-                mSocket.Send(lenBytes, 0, 4, SocketFlags.None);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return false;
+                try
+                {
+                    // Send
+                    mSocket.Send(head, SocketFlags.None);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return false;
+                }
             }
         }
 
         public bool SendEntity(SendPacket entity, ISendDelivery delivery)
         {
-            int cursor = 0;
-            int total = entity.GetLength();
+            long cursor = 0;
+            long total = entity.GetLength();
             Stream stream = entity.GetInputStream();
             int count;
             try
@@ -70,7 +70,7 @@ namespace Net.Qiujuer.Blink
                     cursor += count;
 
                     // Post progress
-                    delivery.PostSendProgress(entity, total, cursor);
+                    delivery.PostSendProgress(entity, (float)cursor / total);
                 }
                 return true;
             }
@@ -85,37 +85,16 @@ namespace Net.Qiujuer.Blink
             return false;
         }
 
-        public void DestroySendIO()
-        {
-            if (mSocket != null)
-                try
-                {
-                    mSocket.Dispose();
-                    mSocket.Close();
-                }
-                catch (IOException e)
-                {
-
-                    Console.WriteLine(e.Message);
-                }
-                finally
-                {
-                    mSocket = null;
-                }
-            mOutBuffer = null;
-        }
-
         public ReceivePacket ReceiveHead()
         {
-            byte[] bytes = new byte[4];
+            byte[] bytes = new byte[8];
             if (mSocket.Receive(bytes, 1, SocketFlags.None) == 1)
             {
                 int type = bytes[0];
                 if (type != -1)
                 {
-                    byte[] lenByte = new byte[4];
-                    mSocket.Receive(lenByte);
-                    int len = BitConverter.ToInt32(lenByte, 0);
+                    mSocket.Receive(bytes);
+                    long len = BitConverter.ToInt64(bytes, 0);
                     ReceivePacket entity = mParser.ParseReceive(type, len);
                     if (entity == null)
                         receiveRedundancy();
@@ -129,8 +108,8 @@ namespace Net.Qiujuer.Blink
         {
             Stream stream = entity.GetOutputStream();
             HashAlgorithm hashAlgorithm = null;
-            int surplusLen = entity.GetLength();
-            int cursor = 0;
+            long surplusLen = entity.GetLength();
+            long cursor = 0;
             try
             {
                 hashAlgorithm = new MD5CryptoServiceProvider();
@@ -139,10 +118,9 @@ namespace Net.Qiujuer.Blink
                 {
                     // Read
                     if (surplusLen > mBufferSize)
-
                         readLen = mSocket.Receive(mInBuffer);
                     else
-                        readLen = mSocket.Receive(mInBuffer, 0, surplusLen, SocketFlags.None);
+                        readLen = mSocket.Receive(mInBuffer, 0, (int)surplusLen, SocketFlags.None);
 
 
                     // Write
@@ -157,7 +135,7 @@ namespace Net.Qiujuer.Blink
                     cursor += readLen;
 
                     // Post progress
-                    delivery.PostReceiveProgress(entity, entity.GetLength(), cursor);
+                    delivery.PostReceiveProgress(entity, (float)cursor / entity.GetLength());
                 }
                 return true;
             }
@@ -177,12 +155,6 @@ namespace Net.Qiujuer.Blink
             }
             return false;
         }
-
-        public void DestroyReceiveIO()
-        {
-            // do...
-        }
-
 
         static void CloseStream(Stream stream)
         {
@@ -210,6 +182,28 @@ namespace Net.Qiujuer.Blink
             {
                 Console.WriteLine(e.Message);
             }
+        }
+
+        public void Dispose()
+        {
+            if (mSocket != null)
+            {
+                try
+                {
+                    mSocket.Dispose();
+                    mSocket.Close();
+                }
+                catch (IOException e)
+                {
+
+                    Console.WriteLine(e.Message);
+                }
+                finally
+                {
+                    mSocket = null;
+                }
+            }
+            mOutBuffer = null;
         }
     }
 }

@@ -10,14 +10,14 @@ namespace Net.Qiujuer.Blink.Box
 {
     public class ByteReceivePacket : BaseReceivePacket<byte[]>
     {
-        public ByteReceivePacket(long id, int type, int len)
+        public ByteReceivePacket(long id, int type, long len)
             : base(id, type, len)
         {
         }
 
         internal override void AdjustStream()
         {
-            mOutStream = new MemoryStream(GetLength());
+            mOutStream = new MemoryStream((int)GetLength());
         }
 
         internal override void AdjustPacket()

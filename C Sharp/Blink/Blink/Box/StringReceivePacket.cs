@@ -10,7 +10,7 @@ namespace Net.Qiujuer.Blink.Box
 {
     public class StringReceivePacket : BaseReceivePacket<String>
     {
-        public StringReceivePacket(long id, int type, int len)
+        public StringReceivePacket(long id, int type, long len)
             : base(id, type, len)
         {
 
@@ -18,7 +18,7 @@ namespace Net.Qiujuer.Blink.Box
 
         internal override void AdjustStream()
         {
-            mOutStream = new MemoryStream(GetLength());
+            mOutStream = new MemoryStream((int)GetLength());
         }
 
         internal override void AdjustPacket()
