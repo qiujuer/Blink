@@ -1,20 +1,15 @@
-﻿using Net.Qiujuer.Blink.Box;
+﻿using Net.Qiujuer.Blink.Async;
+using Net.Qiujuer.Blink.Box;
 using Net.Qiujuer.Blink.Listener;
+using Net.Qiujuer.Blink.Listener.Delivery;
 using Net.Qiujuer.Blink.Tool;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink.Core
 {
-    public class BlinkConn
+    public class BlinkConn : IDestroy
     {
-
-        private readonly AutoQueue<SendPacket> mSendQueue = new AutoQueue<SendPacket>();
-
         private readonly ISender mSender;
 
         private readonly ISendDelivery mSendDelivery;
@@ -25,11 +20,13 @@ namespace Net.Qiujuer.Blink.Core
 
         private readonly IResource mResource;
 
-        private SendDispatcher mSendDispatcher;
+        private readonly IBlinkParser mParser;
 
+        private SendDispatcher mSendDispatcher;
         private ReceiveDispatcher mReceiveDispatcher;
 
-        public BlinkConn(ISender sender, ISendDelivery sendDelivery, IReceiver receiver, IReceiveDelivery receiveDelivery, IResource resource)
+
+        public BlinkConn(ISender sender, ISendDelivery sendDelivery, IReceiver receiver, IReceiveDelivery receiveDelivery, IResource resource, IBlinkParser parser)
         {
             mSender = sender;
             mReceiver = receiver;
@@ -37,6 +34,8 @@ namespace Net.Qiujuer.Blink.Core
 
             mSendDelivery = sendDelivery;
             mReceiveDelivery = receiveDelivery;
+
+            mParser = parser;
 
             // Init this
             Init();
@@ -48,11 +47,9 @@ namespace Net.Qiujuer.Blink.Core
         private void Init()
         {
             // Create the cache dispatcher and start it.
-            mSendDispatcher = new SendDispatcher(mSendQueue, mSender, mSendDelivery);
-            mSendDispatcher.Start();
+            mSendDispatcher = new SendDispatcher(mSender, mSendDelivery);
 
-            mReceiveDispatcher = new ReceiveDispatcher(mReceiver, mReceiveDelivery, this);
-            mReceiveDispatcher.Start();
+            mReceiveDispatcher = new ReceiveDispatcher(mReceiver, mParser, mReceiveDelivery);
         }
 
         /**
@@ -60,20 +57,26 @@ namespace Net.Qiujuer.Blink.Core
          */
         public void Destroy()
         {
+            if (mSendDelivery != null)
+                mSendDelivery.Destroy();
+
+            if (mReceiveDelivery != null)
+                mReceiveDelivery.Destroy();
+
             if (mResource != null)
                 mResource.Clear();
 
             if (mSender != null)
-                mSender.Dispose();
+                mSender.Destroy();
 
             if (mReceiver != null)
-                mReceiver.Dispose();
+                mReceiver.Destroy();
 
             if (mSendDispatcher != null)
-                mSendDispatcher.Quit();
+                mSendDispatcher.Destroy();
 
             if (mReceiveDispatcher != null)
-                mReceiveDispatcher.Quit();
+                mReceiveDispatcher.Destroy();
 
         }
 
@@ -98,7 +101,7 @@ namespace Net.Qiujuer.Blink.Core
         {
             entity.SetBlinkConn(this);
 
-            mSendQueue.Enqueue(entity);
+            mSendDispatcher.Send(entity);
 
             return entity;
         }

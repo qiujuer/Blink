@@ -1,10 +1,5 @@
-﻿using Net.Qiujuer.Blink.Core;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink.Box
 {
@@ -15,20 +10,29 @@ namespace Net.Qiujuer.Blink.Box
         {
         }
 
-        internal override void AdjustStream()
+        internal override bool StartPacket()
         {
-            mOutStream = new MemoryStream((int)GetLength());
+            try
+            {
+                mStream = new MemoryStream((int)GetLength());
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
-        internal override void AdjustPacket()
+        internal override void EndPacket()
         {
-            if (mOutStream != null)
+            if (mStream != null)
             {
-                byte[] bytes = new byte[mOutStream.Length];
-                mOutStream.Seek(0, SeekOrigin.Begin);
-                mOutStream.Read(bytes, 0, bytes.Length);                
+                byte[] bytes = new byte[mStream.Length];
+                mStream.Seek(0, SeekOrigin.Begin);
+                mStream.Read(bytes, 0, bytes.Length);
                 mEntity = bytes;
-                mOutStream = null;
+
+                CloseStream();
             }
         }
     }

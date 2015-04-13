@@ -23,7 +23,6 @@ namespace Net.Qiujuer.Blink
         {
             if (DEBUG)
             {
-                Console.ResetColor();
                 Console.WriteLine("INFO:" + str);
             }
         }
@@ -34,6 +33,7 @@ namespace Net.Qiujuer.Blink
             {
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine("VERBOSE:" + str);
+                Console.ResetColor();
             }
         }
 
@@ -43,6 +43,7 @@ namespace Net.Qiujuer.Blink
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("WARN:" + str);
+                Console.ResetColor();
             }
         }
 
@@ -52,6 +53,7 @@ namespace Net.Qiujuer.Blink
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("ERROR:" + str);
+                Console.ResetColor();
             }
         }
     }

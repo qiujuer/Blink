@@ -14,7 +14,6 @@ namespace Sample
     class Program
     {
         static Socket mServer;
-        static List<BlinkConn> mBlinkConn = new List<BlinkConn>();
         static Thread mThread;
         static bool IsExit = false;
 
@@ -28,7 +27,7 @@ namespace Sample
                 IPEndPoint iep = new IPEndPoint(HostIp, 2626);
                 BlinkLog.I("Start Server Socket...");
                 mServer.Bind(iep);
-                mServer.Listen(26);
+                mServer.Listen(Int32.MaxValue);
                 mThread = new Thread(Run);
                 mThread.Start();
 
@@ -48,15 +47,11 @@ namespace Sample
             {
                 mThread.Interrupt();
             }
-
-            foreach (var b in mBlinkConn)
-            {
-                b.Destroy();
-            }
             mServer.Dispose();
             mServer.Close();
 
         }
+
 
         static void Run()
         {
@@ -67,14 +62,17 @@ namespace Sample
                     BlinkLog.I("Server Socket Accept...");
                     Socket socket = mServer.Accept();
                     BlinkLog.V("New Client Socket.");
-                    BlinkConn conn = Utils.bindBlink(socket);
+
+                    BlinkCallBack callback = new BlinkCallBack(socket);
+
+                    BlinkConn conn = callback.Conn;
                     conn.GetResource().ClearAll();
-                    mBlinkConn.Add(conn);
+
                     BlinkLog.V("Socket To BlinkConn OK.");
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    BlinkLog.E(e.ToString());
+                    //
                 }
             }
         }

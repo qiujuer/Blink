@@ -12,14 +12,14 @@ namespace Net.Qiujuer.Blink.Core
 {
     public abstract class SendPacket : BlinkPacket
     {
-        protected readonly SendListener mListener;
+        public SendListener Listener { get; private set; }
         private bool mCanceled;
         private BlinkConn mBlinkConn;
 
         public SendPacket(int type, SendListener listener)
             : base(type)
         {
-            mListener = listener;
+            Listener = listener;
         }
 
         public void Cancel()
@@ -37,63 +37,17 @@ namespace Net.Qiujuer.Blink.Core
             return mCanceled;
         }
 
-        /// <summary>
-        /// 返回需要发送的头部信息
-        /// 当参数错误时，返回Null
-        /// 并取消发送
-        /// </summary>
-        /// <returns></returns>
-        public virtual IList<ArraySegment<byte>> GetHeadInfo()
+        public virtual short ReadInfo(byte[] buffer, int index)
         {
-            long length = GetLength();
-            if (length <= 0)
-                return null;
-
-            IList<ArraySegment<byte>> info = new List<ArraySegment<byte>>();
-
-            byte[] head = new byte[5];
-
-            // Type
-            head[0] = (byte)GetType();
-            // Length
-            byte[] lenBytes = BitConverter.GetBytes((length));
-            lenBytes.CopyTo(head, 1);
-
-            info.Add(new ArraySegment<byte>(head));
-            return info;
+            return 0;
         }
 
-        public abstract Stream GetInputStream();
+        public abstract int Read(byte[] buffer, int offset, int count);
 
         public SendPacket SetBlinkConn(BlinkConn blinkConn)
         {
             mBlinkConn = blinkConn;
             return this;
-        }
-
-        public void DeliverStart()
-        {
-            if (mListener != null)
-            {
-                mListener.OnSendStart();
-            }
-        }
-
-        public void DeliverProgress(float progress)
-        {
-            if (mListener != null)
-            {
-                mListener.OnSendProgress(progress);
-            }
-        }
-
-        public void DeliverEnd()
-        {
-            mBlinkConn = null;
-            if (mListener != null)
-            {
-                mListener.OnSendEnd(IsSucceed());
-            }
         }
     }
 }

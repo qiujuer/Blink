@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{265A5FC4-7A76-42A0-A1C7-2F329C419907}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlinkTest", "BlinkTest\BlinkTest.csproj", "{7A70E662-AC13-4D05-9180-668D87ADBA2D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{265A5FC4-7A76-42A0-A1C7-2F329C419907}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{265A5FC4-7A76-42A0-A1C7-2F329C419907}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{265A5FC4-7A76-42A0-A1C7-2F329C419907}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A70E662-AC13-4D05-9180-668D87ADBA2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A70E662-AC13-4D05-9180-668D87ADBA2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A70E662-AC13-4D05-9180-668D87ADBA2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A70E662-AC13-4D05-9180-668D87ADBA2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

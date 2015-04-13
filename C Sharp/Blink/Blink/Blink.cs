@@ -1,13 +1,10 @@
-﻿using Net.Qiujuer.Blink.Core;
+﻿using Net.Qiujuer.Blink.Async;
+using Net.Qiujuer.Blink.Core;
 using Net.Qiujuer.Blink.Listener;
-using Net.Qiujuer.Blink.Tool;
+using Net.Qiujuer.Blink.Listener.Delivery;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink
 {
@@ -16,7 +13,7 @@ namespace Net.Qiujuer.Blink
         /**
      * Default on-disk resource directory.
      */
-        private static readonly String DEFAULT_RESOURCE_DIR = "blink";
+        private static readonly String DEFAULT_RESOURCE_DIR = "Blink";
         /**
          * Default buffer size
          */
@@ -33,14 +30,14 @@ namespace Net.Qiujuer.Blink
          * @return BlinkConn
          * @throws Exception
          */
-        public static BlinkConn newConnection(Socket socket, int socketBufferSize, String resourcePath, String fileMark, BlinkListener listener)
+        public static BlinkConn NewConnection(Socket socket, int socketBufferSize, String resourcePath, String fileMark, BlinkListener listener)
         {
             String path = Path.Combine(resourcePath, DEFAULT_RESOURCE_DIR);
             DiskResource resource = new DiskResource(path, fileMark);
             BlinkParser parser = new BlinkParser(resource);
-            SocketAdapter socketAdapter = new SocketAdapter(socket, socketBufferSize, parser);
-            ExecutorDelivery delivery = new ExecutorDelivery(listener);
-            return new BlinkConn(socketAdapter, delivery, socketAdapter, delivery, resource);
+            AsyncSocketAdapter socketAdapter = new AsyncSocketAdapter(socket, socketBufferSize);
+            DelegateDelivery delivery = new DelegateDelivery(listener);
+            return new BlinkConn(socketAdapter, delivery, socketAdapter, delivery, resource, parser);
         }
 
         /**
@@ -53,9 +50,9 @@ namespace Net.Qiujuer.Blink
          * @return BlinkConn
          * @throws Exception
          */
-        public static BlinkConn newConnection(Socket socket, String resourcePath, String fileMark, Executor executor, BlinkListener listener)
+        public static BlinkConn NewConnection(Socket socket, String resourcePath, String fileMark, BlinkListener listener)
         {
-            return newConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, resourcePath, fileMark, listener);
+            return NewConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, resourcePath, fileMark, listener);
         }
 
         /**
@@ -68,9 +65,9 @@ namespace Net.Qiujuer.Blink
          * @return BlinkConn
          * @throws Exception
          */
-        public static BlinkConn newConnection(Socket socket, int socketBufferSize, String resourcePath, Executor executor, BlinkListener listener)
+        public static BlinkConn NewConnection(Socket socket, int socketBufferSize, String resourcePath, BlinkListener listener)
         {
-            return newConnection(socket, socketBufferSize, resourcePath, Guid.NewGuid().ToString(), listener);
+            return NewConnection(socket, socketBufferSize, resourcePath, Guid.NewGuid().ToString(), listener);
         }
 
         /**
@@ -82,9 +79,9 @@ namespace Net.Qiujuer.Blink
          * @return BlinkConn
          * @throws Exception
          */
-        public static BlinkConn newConnection(Socket socket, String resourcePath, BlinkListener listener)
+        public static BlinkConn NewConnection(Socket socket, String resourcePath, BlinkListener listener)
         {
-            return newConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, resourcePath, Guid.NewGuid().ToString(), listener);
+            return NewConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, resourcePath, Guid.NewGuid().ToString(), listener);
         }
 
         /**
@@ -95,17 +92,9 @@ namespace Net.Qiujuer.Blink
          * @return BlinkConn
          * @throws Exception
          */
-        public static BlinkConn newConnection(Socket socket, BlinkListener listener)
+        public static BlinkConn NewConnection(Socket socket, BlinkListener listener)
         {
-            return newConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, getDefaultResourcePath(), Guid.NewGuid().ToString(), listener);
-        }
-
-        class SingleExecutor : Executor
-        {
-            public void Execute(Runnable command)
-            {
-                command.Run();
-            }
+            return NewConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, getDefaultResourcePath(), Guid.NewGuid().ToString(), listener);
         }
 
 

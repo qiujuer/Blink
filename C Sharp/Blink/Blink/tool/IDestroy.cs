@@ -2,13 +2,13 @@
 namespace Net.Qiujuer.Blink.Tool
 {
     /// <summary>
-    /// One Runnable Interface
+    /// Destroy Interface
     /// </summary>
-    public interface Runnable
+    public interface IDestroy
     {
         /// <summary>
-        /// Doing something
+        /// On Class Destroy
         /// </summary>
-        void Run();
+        void Destroy();
     }
 }

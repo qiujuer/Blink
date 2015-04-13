@@ -26,13 +26,13 @@ namespace Net.Qiujuer.Blink.Core
             ReceivePacket packet = null;
             switch (type)
             {
-                case BlinkPacket.Type.STRING:
+                case BlinkPacket.PacketType.STRING:
                     packet = new StringReceivePacket(id, type, len);
                     break;
-                case BlinkPacket.Type.BYTES:
+                case BlinkPacket.PacketType.BYTES:
                     packet = new ByteReceivePacket(id, type, len); ;
                     break;
-                case BlinkPacket.Type.FILE:
+                case BlinkPacket.PacketType.FILE:
                     String file = mResource.Create(id);
                     if (file != null)
                         packet = new FileReceivePacket(id, type, len, file);

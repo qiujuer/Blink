@@ -1,28 +1,14 @@
 ﻿
-using System;
+using Net.Qiujuer.Blink.Tool;
+using System.Net.Sockets;
 namespace Net.Qiujuer.Blink.Core
 {
     /**
      * Receive entity interface
      */
-    public interface IReceiver : IDisposable
+    public interface IReceiver : IDestroy
     {
-        /**
-         * Receive the entity's information
-         *
-         * @return ReceiveEntity
-         */
-        ReceivePacket ReceiveHead();
-
-
-        /**
-         * Receive entity
-         *
-         * @param entity   ReceiveEntity
-         * @param delivery ReceiveDelivery
-         * @return ReceiveEntity
-         */
-        bool ReceiveEntity(ReceivePacket entity, IReceiveDelivery delivery);
-
+        int GetBufferSize();
+        bool ReceiveAsync(SocketAsyncEventArgs e);
     }
 }

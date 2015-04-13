@@ -1,5 +1,4 @@
-﻿
-using Net.Qiujuer.Blink.Core;
+﻿using Net.Qiujuer.Blink.Core;
 using System.Net.Sockets;
 namespace Net.Qiujuer.Blink.Listener
 {
@@ -14,6 +13,6 @@ namespace Net.Qiujuer.Blink.Listener
 
         void OnReceiveEnd(ReceivePacket paket);
 
-        //void OnSocketError(SocketException e);
+        void OnBlinkDisconnect();
     }
 }

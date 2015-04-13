@@ -53,7 +53,7 @@ public class Client {
             return;
 
         System.out.println("Test Send String...");
-        for (int i = 0; i <= 1; i++) {
+        for (int i = 0; i <= 0; i++) {
             conn.send("Test String:" + i);
             try {
                 Thread.sleep(1000);
@@ -63,7 +63,7 @@ public class Client {
         }
 
         System.out.println("Test Bytes...");
-        conn.send(new byte[]{1, 1, 0, 0});
+        //conn.send(new byte[]{1, 1, 0, 0});
 
         System.out.println("Test File...");
         conn.send(new File("F:/TDDOWNLOAD/Game/DevilMayCry4.7z"));

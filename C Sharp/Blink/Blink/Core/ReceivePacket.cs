@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink.Core
 {
@@ -13,7 +8,6 @@ namespace Net.Qiujuer.Blink.Core
     public abstract class ReceivePacket : BlinkPacket
     {
         private readonly long mId;
-        protected Stream mOutStream;
         private String mHash;
 
         public ReceivePacket(long id, int type, long len)
@@ -28,11 +22,6 @@ namespace Net.Qiujuer.Blink.Core
             return mId;
         }
 
-        public Stream GetOutputStream()
-        {
-            return mOutStream;
-        }
-
         public void SetHash(String hashCode)
         {
             mHash = hashCode;
@@ -43,8 +32,8 @@ namespace Net.Qiujuer.Blink.Core
             return mHash;
         }
 
-        internal abstract void AdjustStream();
+        public virtual void WriteInfo(byte[] buffer, int offset, int count) { }
 
-        internal abstract void AdjustPacket();
+        public abstract void Write(byte[] buffer, int offset, int count);
     }
 }

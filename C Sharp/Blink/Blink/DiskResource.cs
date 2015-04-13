@@ -26,28 +26,43 @@ namespace Net.Qiujuer.Blink
             mRootDirectory = rootDirectory;
             mMark = mark;
 
+            CreatePath();
+            Clear();
+        }
+
+        private void CreatePath()
+        {
             // Create
             if (Directory.Exists(mRootDirectory) == false)
             {
-                Directory.CreateDirectory(mRootDirectory);
+                try
+                {
+                    Directory.CreateDirectory(mRootDirectory);
+                }
+                catch (Exception e)
+                {
+                    BlinkLog.V(e.Message);
+                }
             }
-
-            Clear();
         }
 
         public String Create(long id)
         {
-            String path = Path.Combine(mRootDirectory, String.Format("{0}_{1}", mMark, id));
+            String path = Path.Combine(mRootDirectory, String.Format("{0}_{1}.blink", mMark, id));
             if (!File.Exists(path))
+            {
+                CreatePath();
                 try
                 {
-                    File.Create(path).Close();
-
+                    FileStream stream = File.Create(path);
+                    stream.Dispose();
+                    stream.Close();
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    BlinkLog.V(e.Message);
                 }
+            }
             if (!File.Exists(path))
                 return null;
             else
@@ -79,6 +94,7 @@ namespace Net.Qiujuer.Blink
                 Directory.Delete(mRootDirectory, true);
             }
             catch (Exception) { }
+            CreatePath();
             BlinkLog.V("Resource cleared path.");
         }
 

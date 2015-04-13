@@ -1,11 +1,7 @@
-﻿using Net.Qiujuer.Blink.Core;
-using Net.Qiujuer.Blink.Listener;
+﻿using Net.Qiujuer.Blink.Listener;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink.Box
 {
@@ -17,21 +13,40 @@ namespace Net.Qiujuer.Blink.Box
         }
 
         public FileSendPacket(FileInfo entity, SendListener listener)
-            : base(entity, Type.BYTES, listener)
+            : base(entity, PacketType.FILE, listener)
         {
-            mLength = (int)mEntity.Length;
+            mLength = mEntity.Length;
         }
 
-        public override Stream GetInputStream()
+        internal override bool StartPacket()
         {
             try
             {
-                return mEntity.OpenRead();
+                mStream = mEntity.OpenRead();
+                return true;
             }
-            catch (FileNotFoundException e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
-                return null;
+                return false;
+            }
+        }
+
+        internal override void EndPacket()
+        {
+            CloseStream();
+        }
+
+        public override short ReadInfo(byte[] buffer, int index)
+        {
+            try
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(mEntity.Name);
+                bytes.CopyTo(buffer, index);
+                return Convert.ToInt16(bytes.Length);
+            }
+            catch (Exception)
+            {
+                return 0;
             }
         }
     }

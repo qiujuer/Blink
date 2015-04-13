@@ -1,19 +1,15 @@
 ﻿using Net.Qiujuer.Blink.Core;
-using Net.Qiujuer.Blink.Listener;
 using Net.Qiujuer.Blink.Tool;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Net.Qiujuer.Blink
+namespace Net.Qiujuer.Blink.Listener.Delivery
 {
     class ExecutorDelivery : IReceiveDelivery, ISendDelivery
     {
         private event EventHandler<Runnable> mBlinkPoster;
         private event EventHandler<Runnable> mSendPoster;
-        private readonly BlinkListener mBlinkListener;
+        private BlinkListener mBlinkListener;
+
 
         public ExecutorDelivery(BlinkListener listener)
         {
@@ -35,34 +31,67 @@ namespace Net.Qiujuer.Blink
 
         public void PostReceiveStart(ReceivePacket entity)
         {
-            mBlinkPoster.BeginInvoke(null, new ReceiveDeliveryRunnable(GetBlinkListener(), entity, 0, false), null, null);
+            BlinkListener listener = GetBlinkListener();
+            if (listener != null)
+                PostBlink(new ReceiveDeliveryRunnable(listener, entity, 0, false));
         }
 
         public void PostReceiveEnd(ReceivePacket entity, bool isSuccess)
         {
-            entity.SetSuccess(isSuccess);
-            mBlinkPoster.BeginInvoke(null, new ReceiveDeliveryRunnable(GetBlinkListener(), entity, 0, true), null, null);
+            BlinkListener listener = GetBlinkListener();
+            if (listener != null)
+            {
+                entity.SetSuccess(isSuccess);
+                PostBlink(new ReceiveDeliveryRunnable(listener, entity, 0, true));
+            }
         }
 
         public void PostReceiveProgress(ReceivePacket entity, float progress)
         {
-            mBlinkPoster.BeginInvoke(null, new ReceiveDeliveryRunnable(GetBlinkListener(), entity, progress, false), null, null);
+            BlinkListener listener = GetBlinkListener();
+            if (listener != null)
+                PostBlink(new ReceiveDeliveryRunnable(listener, entity, progress, false));
+        }
+
+        public void PostBlinkDisconnect()
+        {
+            BlinkListener listener = GetBlinkListener();
+            if (listener != null)
+                PostBlink(new BlinkDeliveryRunnable(listener));
+        }
+
+        private void PostBlink(Runnable runnable)
+        {
+            EventHandler<Runnable> handler = mBlinkPoster;
+            if (handler != null)
+            {
+                handler.BeginInvoke(null, runnable, null, null);
+            }
+        }
+
+        private void PostSend(Runnable runnable)
+        {
+            EventHandler<Runnable> handler = mSendPoster;
+            if (handler != null)
+            {
+                handler.BeginInvoke(null, runnable, null, null);
+            }
         }
 
         public void PostSendStart(SendPacket entity)
         {
-            mSendPoster.BeginInvoke(null, new SendDeliveryRunnable(entity, 0, false), null, null);
+            PostSend(new SendDeliveryRunnable(entity, 0, false));
         }
 
         public void PostSendEnd(SendPacket entity, bool isSuccess)
         {
             entity.SetSuccess(isSuccess);
-            mSendPoster.BeginInvoke(null, new SendDeliveryRunnable(entity, 0, true), null, null);
+            PostSend(new SendDeliveryRunnable(entity, 0, true));
         }
 
         public void PostSendProgress(SendPacket entity, float progress)
         {
-            mSendPoster.BeginInvoke(null, new SendDeliveryRunnable(entity, progress, false), null, null);
+            PostSend(new SendDeliveryRunnable(entity, progress, false));
         }
 
 
@@ -74,6 +103,33 @@ namespace Net.Qiujuer.Blink
         protected BlinkListener GetBlinkListener()
         {
             return mBlinkListener;
+        }
+
+        /// <summary>
+        /// Destroy the event
+        /// </summary>
+        public void Destroy()
+        {
+            mBlinkListener = null;
+            mBlinkPoster -= ExecutorDelivery_BlinkPoster;
+            mSendPoster -= ExecutorDelivery_SendPoster;
+        }
+
+        private class BlinkDeliveryRunnable : Runnable
+        {
+            private BlinkListener listener;
+            public BlinkDeliveryRunnable(BlinkListener listener)
+            {
+                this.listener = listener;
+            }
+            public void Run()
+            {
+                if (listener != null)
+                {
+                    listener.OnBlinkDisconnect();
+                    listener = null;
+                }
+            }
         }
 
         private class ReceiveDeliveryRunnable : Runnable
@@ -107,7 +163,6 @@ namespace Net.Qiujuer.Blink
             }
         }
 
-
         private class SendDeliveryRunnable : Runnable
         {
             private SendPacket entity;
@@ -126,12 +181,7 @@ namespace Net.Qiujuer.Blink
             {
                 if (!entity.IsCanceled())
                 {
-                    if (progress > 0)
-                        entity.DeliverProgress(progress);
-                    else if (isEnd)
-                        entity.DeliverEnd();
-                    else
-                        entity.DeliverStart();
+                    entity.Listener.OnSendProgress(progress);
                 }
 
                 entity = null;

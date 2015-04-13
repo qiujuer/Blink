@@ -35,11 +35,15 @@ namespace Net.Qiujuer.Blink.Core
             return mSucceed;
         }
 
-        public static class Type
+        internal abstract bool StartPacket();
+
+        internal abstract void EndPacket();
+
+        public static class PacketType
         {
-            public const int STRING = 0;
-            public const int BYTES = 1;
-            public const int FILE = 2;
+            public const int STRING = 1;
+            public const int BYTES = 2;
+            public const int FILE = 3;
         }
     }
 }

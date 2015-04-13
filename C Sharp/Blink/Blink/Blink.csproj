@@ -39,6 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Async\AsyncSocketAdapter.cs" />
+    <Compile Include="Async\ReceiveDispatcher.cs" />
+    <Compile Include="Async\SendDispatcher.cs" />
     <Compile Include="Async\SocketAsyncEventArgsPool.cs" />
     <Compile Include="Blink.cs" />
     <Compile Include="BlinkLog.cs" />
@@ -54,24 +57,22 @@
     <Compile Include="Box\BaseSendPacket.cs" />
     <Compile Include="Core\BlinkParser.cs" />
     <Compile Include="Core\IBlinkPacket.cs" />
-    <Compile Include="Core\IReceiveDelivery.cs" />
-    <Compile Include="Core\ReceiveDispatcher.cs" />
+    <Compile Include="Listener\Delivery\IReceiveDelivery.cs" />
     <Compile Include="Core\ReceivePacket.cs" />
     <Compile Include="Core\IBlinkParser.cs" />
     <Compile Include="Core\IReceiver.cs" />
     <Compile Include="Core\IResource.cs" />
-    <Compile Include="Core\ISendDelivery.cs" />
-    <Compile Include="Core\SendDispatcher.cs" />
+    <Compile Include="Listener\Delivery\ISendDelivery.cs" />
     <Compile Include="Core\ISender.cs" />
     <Compile Include="Core\SendPacket.cs" />
     <Compile Include="DiskResource.cs" />
-    <Compile Include="ExecutorDelivery.cs" />
+    <Compile Include="Listener\Delivery\ExecutorDelivery.cs" />
     <Compile Include="Listener\BlinkListener.cs" />
     <Compile Include="Listener\SendListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SocketAdapter.cs" />
-    <Compile Include="Tool\AutoQueue.cs" />
-    <Compile Include="Tool\Executor.cs" />
+    <Compile Include="Listener\Delivery\DelegateDelivery.cs" />
+    <Compile Include="Listener\Delivery\TaskDelivery.cs" />
+    <Compile Include="Tool\IDestroy.cs" />
     <Compile Include="Tool\Runnable.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

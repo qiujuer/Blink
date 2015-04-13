@@ -1,11 +1,13 @@
-﻿using Net.Qiujuer.Blink.Listener;
+﻿using Net.Qiujuer.Blink.Core;
+using Net.Qiujuer.Blink.Listener;
+using Net.Qiujuer.Blink.Tool;
 
-namespace Net.Qiujuer.Blink.Core
+namespace Net.Qiujuer.Blink.Listener.Delivery
 {
     /// <summary>
     /// Receiver delivery interface
     /// </summary>
-    public interface IReceiveDelivery
+    public interface IReceiveDelivery : IDestroy
     {
 
         /**
@@ -22,5 +24,10 @@ namespace Net.Qiujuer.Blink.Core
          * Parses a progress response from the receiver.
          */
         void PostReceiveProgress(ReceivePacket entity, float progress);
+
+        /// <summary>
+        /// On Socket Disconnect Post CallBack
+        /// </summary>
+        void PostBlinkDisconnect();
     }
 }

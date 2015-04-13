@@ -1,27 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Net.Qiujuer.Blink.Tool;
+using System.Net.Sockets;
 
 namespace Net.Qiujuer.Blink.Core
 {
-    public interface ISender : IDisposable
+    public interface ISender : IDestroy
     {
-        /**
-         * Send the entity's information
-         *
-         * @param entity SendEntity
-         * @return Status
-         */
-        bool SendHead(SendPacket entity);
-
-        /**
-         * Send entity
-         *
-         * @param entity SendEntity
-         * @return Status
-         */
-        bool SendEntity(SendPacket entity, ISendDelivery delivery);
+        int GetBufferSize();
+        bool SendAsync(SocketAsyncEventArgs e);
     }
 }

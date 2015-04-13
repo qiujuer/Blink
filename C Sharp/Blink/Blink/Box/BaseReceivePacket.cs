@@ -1,14 +1,12 @@
 ﻿using Net.Qiujuer.Blink.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace Net.Qiujuer.Blink.Box
 {
     public abstract class BaseReceivePacket<T> : ReceivePacket
     {
+        protected Stream mStream;
         protected T mEntity;
 
         public BaseReceivePacket(long id, int type, long len)
@@ -19,6 +17,35 @@ namespace Net.Qiujuer.Blink.Box
         public T GetEntity()
         {
             return mEntity;
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            Stream stream = mStream;
+            if (stream != null)
+            {
+                try
+                {
+                    stream.Write(buffer, offset, count);
+                    stream.Flush();
+                }
+                catch (Exception) { }
+            }
+        }
+
+        protected void CloseStream()
+        {
+            Stream stream = mStream;
+            mStream = null;
+            if (stream != null)
+            {
+                try
+                {
+                    stream.Dispose();
+                    stream.Close();
+                }
+                catch (Exception) { }
+            }
         }
     }
 }
