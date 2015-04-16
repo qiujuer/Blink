@@ -10,7 +10,7 @@ namespace Net.Qiujuer.Blink.Core
         private readonly long mId;
         private String mHash;
 
-        public ReceivePacket(long id, int type, long len)
+        public ReceivePacket(long id, byte type, long len)
             : base(type)
         {
             mId = id;

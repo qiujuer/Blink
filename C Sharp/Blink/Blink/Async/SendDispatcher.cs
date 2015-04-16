@@ -243,6 +243,10 @@ namespace Net.Qiujuer.Blink.Async
                     SetBuffer(null, 0, 0);
                 }
                 catch (Exception) { }
+
+                // Clear
+                while (mQueue.TryDequeue(out packet)) { }
+
                 Dispose();
             }
         }

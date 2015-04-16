@@ -10,7 +10,7 @@ namespace Net.Qiujuer.Blink.Box
         private string mFileName;
         private HashAlgorithm mHashAlgorithm = null;
 
-        public FileReceivePacket(long id, int type, long len, String path)
+        public FileReceivePacket(long id, byte type, long len, String path)
             : base(id, type, len)
         {
             mEntity = new FileInfo(path);

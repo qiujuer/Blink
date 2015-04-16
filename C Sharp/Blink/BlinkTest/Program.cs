@@ -33,7 +33,7 @@ namespace BlinkTest
         {
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-            IPAddress HostIp = IPAddress.Parse("192.168.0.107");
+            IPAddress HostIp = IPAddress.Parse("127.0.0.1");
             socket.Connect(HostIp, 2626);
 
             BlinkConn conn = Blink.NewConnection(socket, 1024 * 1024, "D:/", Guid.NewGuid().ToString(), null);

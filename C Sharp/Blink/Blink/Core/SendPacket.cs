@@ -16,7 +16,7 @@ namespace Net.Qiujuer.Blink.Core
         private bool mCanceled;
         private BlinkConn mBlinkConn;
 
-        public SendPacket(int type, SendListener listener)
+        public SendPacket(byte type, SendListener listener)
             : base(type)
         {
             Listener = listener;

@@ -5,7 +5,7 @@ namespace Net.Qiujuer.Blink.Box
 {
     public class StringReceivePacket : BaseReceivePacket<String>
     {
-        public StringReceivePacket(long id, int type, long len)
+        public StringReceivePacket(long id, byte type, long len)
             : base(id, type, len)
         {
 

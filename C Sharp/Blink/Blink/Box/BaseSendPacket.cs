@@ -10,7 +10,7 @@ namespace Net.Qiujuer.Blink.Box
         protected T mEntity;
         protected Stream mStream;
 
-        public BaseSendPacket(T entity, int type, SendListener listener)
+        public BaseSendPacket(T entity, byte type, SendListener listener)
             : base(type, listener)
         {
             mEntity = entity;

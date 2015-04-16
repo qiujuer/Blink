@@ -83,7 +83,7 @@ namespace Net.Qiujuer.Blink.Async
         {
             mSurplusLen = 0;
             mSurplusInfoLen = 0;
-            int type = buffer[0];
+            byte type = buffer[0];
             long len = BitConverter.ToInt64(buffer, 1);
             short info = BitConverter.ToInt16(buffer, HeadSize - 2);
 

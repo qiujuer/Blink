@@ -6,11 +6,11 @@ namespace Net.Qiujuer.Blink.Core
     /// </summary>
     public abstract class BlinkPacket : IBlinkPacket
     {
-        protected int mType;
+        protected byte mType;
         protected long mLength;
         private bool mSucceed;
 
-        public BlinkPacket(int type)
+        public BlinkPacket(byte type)
         {
             mType = type;
         }
@@ -41,9 +41,9 @@ namespace Net.Qiujuer.Blink.Core
 
         public static class PacketType
         {
-            public const int STRING = 1;
-            public const int BYTES = 2;
-            public const int FILE = 3;
+            public const byte STRING = 1;
+            public const byte BYTES = 2;
+            public const byte FILE = 3;
         }
     }
 }

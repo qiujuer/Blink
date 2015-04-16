@@ -1,5 +1,6 @@
 ﻿using Net.Qiujuer.Blink.Core;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,7 +11,7 @@ namespace Net.Qiujuer.Blink.Listener.Delivery
         private delegate void Progress();
 
         private BlinkListener mBlinkListener;
-        private Queue<Action> mQueue = new Queue<Action>();
+        private ConcurrentQueue<Action> mQueue = new ConcurrentQueue<Action>();
         private volatile bool IsNotify = false;
 
         public DelegateDelivery(BlinkListener listener)
@@ -20,31 +21,17 @@ namespace Net.Qiujuer.Blink.Listener.Delivery
 
         private void Run()
         {
-            try
+            Action action = null;
+            while (IsNotify = mQueue.TryDequeue(out action))
             {
-                while (true)
-                {
-                    Action action = null;
-                    lock (mQueue)
-                    {
-                        action = mQueue.Dequeue();
-                    }
-                    action();
-                }
+                action();
+                action -= action;
             }
-            catch (Exception)
-            {
-                IsNotify = false;
-            }
-
         }
 
         private void PostQueue(Action action)
         {
-            lock (mQueue)
-            {
-                mQueue.Enqueue(action);
-            }
+            mQueue.Enqueue(action);
 
             if (!IsNotify)
             {
@@ -119,7 +106,11 @@ namespace Net.Qiujuer.Blink.Listener.Delivery
         public void Destroy()
         {
             mBlinkListener = null;
-            mQueue.Clear();
+            Action action = null;
+            while (mQueue.TryDequeue(out action))
+            {
+                action -= action;
+            }
         }
     }
 }

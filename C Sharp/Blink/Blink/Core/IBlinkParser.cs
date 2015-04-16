@@ -13,6 +13,6 @@ namespace Net.Qiujuer.Blink.Core
     /// </summary>
     public interface IBlinkParser
     {
-        ReceivePacket ParseReceive(int type, long len);
+        ReceivePacket ParseReceive(byte type, long len);
     }
 }

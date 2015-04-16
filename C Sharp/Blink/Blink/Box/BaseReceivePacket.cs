@@ -9,7 +9,7 @@ namespace Net.Qiujuer.Blink.Box
         protected Stream mStream;
         protected T mEntity;
 
-        public BaseReceivePacket(long id, int type, long len)
+        public BaseReceivePacket(long id, byte type, long len)
             : base(id, type, len)
         {
         }
@@ -41,6 +41,7 @@ namespace Net.Qiujuer.Blink.Box
             {
                 try
                 {
+                    stream.Flush();
                     stream.Dispose();
                     stream.Close();
                 }
