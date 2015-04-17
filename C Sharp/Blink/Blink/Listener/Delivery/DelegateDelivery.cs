@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink.Listener.Delivery
 {
-    class DelegateDelivery : IReceiveDelivery, ISendDelivery
+    class DelegateDelivery : ReceiveDelivery, SendDelivery
     {
         private delegate void Progress();
 
@@ -103,7 +103,7 @@ namespace Net.Qiujuer.Blink.Listener.Delivery
         /// <summary>
         /// Destroy the event
         /// </summary>
-        public void Destroy()
+        public void Dispose()
         {
             mBlinkListener = null;
             Action action = null;

@@ -1,5 +1,6 @@
 ﻿using Net.Qiujuer.Blink;
 using Net.Qiujuer.Blink.Core;
+using Net.Qiujuer.Blink.Kit;
 using Net.Qiujuer.Blink.Listener;
 using System;
 using System.IO;
@@ -46,7 +47,7 @@ namespace Client
 
 
             if (mBlinkConn != null)
-                mBlinkConn.Destroy();
+                mBlinkConn.Dispose();
             if (mSocket != null)
             {
                 mSocket.Dispose();

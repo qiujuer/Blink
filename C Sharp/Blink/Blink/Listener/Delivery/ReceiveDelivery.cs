@@ -1,13 +1,13 @@
 ﻿using Net.Qiujuer.Blink.Core;
 using Net.Qiujuer.Blink.Listener;
-using Net.Qiujuer.Blink.Tool;
+using System;
 
 namespace Net.Qiujuer.Blink.Listener.Delivery
 {
     /// <summary>
     /// Receiver delivery interface
     /// </summary>
-    public interface IReceiveDelivery : IDestroy
+    public interface ReceiveDelivery : IDisposable
     {
 
         /**

@@ -2,12 +2,12 @@
 using System;
 using System.IO;
 
-namespace Net.Qiujuer.Blink
+namespace Net.Qiujuer.Blink.Kit
 {
     /**
      * Disk resource implements Resource{@link Resource}
      */
-    public class DiskResource : IResource
+    public class DiskResource : Resource
     {
         /**
          * A unique identifier on the Resource clear

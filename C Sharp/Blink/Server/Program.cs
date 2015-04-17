@@ -1,5 +1,6 @@
 ﻿using Net.Qiujuer.Blink;
 using Net.Qiujuer.Blink.Core;
+using Net.Qiujuer.Blink.Kit;
 using System;
 using System.Collections.Generic;
 using System.Linq;

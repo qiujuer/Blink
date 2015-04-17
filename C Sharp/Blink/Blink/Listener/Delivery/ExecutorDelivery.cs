@@ -1,10 +1,10 @@
 ﻿using Net.Qiujuer.Blink.Core;
-using Net.Qiujuer.Blink.Tool;
+using Net.Qiujuer.Blink.Kit;
 using System;
 
 namespace Net.Qiujuer.Blink.Listener.Delivery
 {
-    class ExecutorDelivery : IReceiveDelivery, ISendDelivery
+    class ExecutorDelivery : ReceiveDelivery, SendDelivery
     {
         private event EventHandler<Runnable> mBlinkPoster;
         private event EventHandler<Runnable> mSendPoster;
@@ -108,7 +108,7 @@ namespace Net.Qiujuer.Blink.Listener.Delivery
         /// <summary>
         /// Destroy the event
         /// </summary>
-        public void Destroy()
+        public void Dispose()
         {
             mBlinkListener = null;
             mBlinkPoster -= ExecutorDelivery_BlinkPoster;

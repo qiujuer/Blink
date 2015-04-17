@@ -1,5 +1,5 @@
 ﻿
-namespace Net.Qiujuer.Blink.Tool
+namespace Net.Qiujuer.Blink.Kit
 {
     /// <summary>
     /// One Runnable Interface

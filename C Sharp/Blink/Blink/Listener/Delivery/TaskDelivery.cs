@@ -1,12 +1,12 @@
 ﻿using Net.Qiujuer.Blink.Core;
-using Net.Qiujuer.Blink.Tool;
+using Net.Qiujuer.Blink.Kit;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink.Listener.Delivery
 {
-    class TaskDelivery : IReceiveDelivery, ISendDelivery
+    class TaskDelivery : ReceiveDelivery, SendDelivery
     {
         private BlinkListener mBlinkListener;
         private Queue<Runnable> mQueue = new Queue<Runnable>();
@@ -103,7 +103,7 @@ namespace Net.Qiujuer.Blink.Listener.Delivery
         /// <summary>
         /// Destroy the event
         /// </summary>
-        public void Destroy()
+        public void Dispose()
         {
             mBlinkListener = null;
             mQueue.Clear();

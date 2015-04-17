@@ -2,31 +2,30 @@
 using Net.Qiujuer.Blink.Box;
 using Net.Qiujuer.Blink.Listener;
 using Net.Qiujuer.Blink.Listener.Delivery;
-using Net.Qiujuer.Blink.Tool;
 using System;
 using System.IO;
 
 namespace Net.Qiujuer.Blink.Core
 {
-    public class BlinkConn : IDestroy
+    public class BlinkConn : IDisposable
     {
-        private readonly ISender mSender;
+        private readonly Sender mSender;
 
-        private readonly ISendDelivery mSendDelivery;
+        private readonly SendDelivery mSendDelivery;
 
-        private readonly IReceiver mReceiver;
+        private readonly Receiver mReceiver;
 
-        private readonly IReceiveDelivery mReceiveDelivery;
+        private readonly ReceiveDelivery mReceiveDelivery;
 
-        private readonly IResource mResource;
+        private readonly Resource mResource;
 
-        private readonly IBlinkParser mParser;
+        private readonly BlinkParser mParser;
 
         private SendDispatcher mSendDispatcher;
         private ReceiveDispatcher mReceiveDispatcher;
 
 
-        public BlinkConn(ISender sender, ISendDelivery sendDelivery, IReceiver receiver, IReceiveDelivery receiveDelivery, IResource resource, IBlinkParser parser)
+        public BlinkConn(Sender sender, SendDelivery sendDelivery, Receiver receiver, ReceiveDelivery receiveDelivery, Resource resource, BlinkParser parser)
         {
             mSender = sender;
             mReceiver = receiver;
@@ -55,28 +54,25 @@ namespace Net.Qiujuer.Blink.Core
         /**
          * Stops the cache and network dispatchers.
          */
-        public void Destroy()
+        public void Dispose()
         {
             if (mSendDelivery != null)
-                mSendDelivery.Destroy();
+                mSendDelivery.Dispose();
 
             if (mReceiveDelivery != null)
-                mReceiveDelivery.Destroy();
-
-            if (mResource != null)
-                mResource.Clear();
+                mReceiveDelivery.Dispose();
 
             if (mSender != null)
-                mSender.Destroy();
+                mSender.Dispose();
 
             if (mReceiver != null)
-                mReceiver.Destroy();
+                mReceiver.Dispose();
 
             if (mSendDispatcher != null)
-                mSendDispatcher.Destroy();
+                mSendDispatcher.Dispose();
 
             if (mReceiveDispatcher != null)
-                mReceiveDispatcher.Destroy();
+                mReceiveDispatcher.Dispose();
 
         }
 
@@ -85,7 +81,7 @@ namespace Net.Qiujuer.Blink.Core
          *
          * @return Resource
          */
-        public IResource GetResource()
+        public Resource GetResource()
         {
             return mResource;
         }

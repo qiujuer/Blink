@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Net.Qiujuer.Blink
+namespace Net.Qiujuer.Blink.Kit
 {
     /**
  * Logging helper class.

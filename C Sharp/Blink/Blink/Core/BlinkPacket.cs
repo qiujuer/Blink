@@ -2,48 +2,16 @@
 namespace Net.Qiujuer.Blink.Core
 {
     /// <summary>
-    /// Blink Data Packet
+    /// Bink Packet interface
     /// </summary>
-    public abstract class BlinkPacket : IBlinkPacket
+    public interface BlinkPacket
     {
-        protected byte mType;
-        protected long mLength;
-        private bool mSucceed;
+        int GetType();
 
-        public BlinkPacket(byte type)
-        {
-            mType = type;
-        }
+        long GetLength();
 
-        public new int GetType()
-        {
-            return mType;
-        }
+        void SetSuccess(bool isSuccess);
 
-        public long GetLength()
-        {
-            return mLength;
-        }
-
-        public void SetSuccess(bool isSuccess)
-        {
-            this.mSucceed = isSuccess;
-        }
-
-        public bool IsSucceed()
-        {
-            return mSucceed;
-        }
-
-        internal abstract bool StartPacket();
-
-        internal abstract void EndPacket();
-
-        public static class PacketType
-        {
-            public const byte STRING = 1;
-            public const byte BYTES = 2;
-            public const byte FILE = 3;
-        }
+        bool IsSucceed();
     }
 }

@@ -1,11 +1,11 @@
 ﻿using Net.Qiujuer.Blink.Core;
-using Net.Qiujuer.Blink.Tool;
+using System;
 namespace Net.Qiujuer.Blink.Listener.Delivery
 {
     /// <summary>
     /// Send delivery interface
     /// </summary>
-    public interface ISendDelivery : IDestroy
+    public interface SendDelivery : IDisposable
     {
         /**
          * Parses a progress response from the sender.

@@ -40,11 +40,11 @@ namespace Sample
 
         public void OnReceiveEnd(ReceivePacket paket)
         {
-            if (paket.GetType() == BlinkPacket.PacketType.STRING)
+            if (paket.GetType() == BlinkPacketImpl.PacketType.STRING)
                 Console.WriteLine("Receive->end: String:"
                         + paket.GetId() + " " + paket.GetLength() + " :"
                         + ((StringReceivePacket)paket).GetEntity());
-            else if (paket.GetType() == BlinkPacket.PacketType.BYTES)
+            else if (paket.GetType() == BlinkPacketImpl.PacketType.BYTES)
                 Console.WriteLine("Receive->end: Bytes:"
                         + paket.GetId() + " " + paket.GetLength() + " :"
                         + ((ByteReceivePacket)paket).GetEntity());
@@ -64,7 +64,7 @@ namespace Sample
         {
             Console.WriteLine("BlinkDisconnect");
 
-            this.Conn.Destroy();
+            this.Conn.Dispose();
 
             mBlinkCallBacks.Remove(this);
         }

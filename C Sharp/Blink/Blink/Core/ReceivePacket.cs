@@ -5,7 +5,7 @@ namespace Net.Qiujuer.Blink.Core
     /// <summary>
     /// Receive Packet
     /// </summary>
-    public abstract class ReceivePacket : BlinkPacket
+    public abstract class ReceivePacket : BlinkPacketImpl
     {
         private readonly long mId;
         private String mHash;

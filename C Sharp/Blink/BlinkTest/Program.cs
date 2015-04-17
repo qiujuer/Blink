@@ -1,5 +1,6 @@
 ﻿using Net.Qiujuer.Blink;
 using Net.Qiujuer.Blink.Core;
+using Net.Qiujuer.Blink.Kit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,7 +50,7 @@ namespace BlinkTest
                     Thread.Sleep(2);
                     if (IsExit)
                     {
-                        conn.Destroy();
+                        conn.Dispose();
                         socket.Shutdown(SocketShutdown.Both);
                         socket.Dispose();
                         socket.Close();

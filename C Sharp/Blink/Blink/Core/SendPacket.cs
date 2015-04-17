@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink.Core
 {
-    public abstract class SendPacket : BlinkPacket
+    public abstract class SendPacket : BlinkPacketImpl
     {
         public SendListener Listener { get; private set; }
         private bool mCanceled;

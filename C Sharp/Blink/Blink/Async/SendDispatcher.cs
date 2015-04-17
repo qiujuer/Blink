@@ -1,6 +1,5 @@
 ﻿using Net.Qiujuer.Blink.Core;
 using Net.Qiujuer.Blink.Listener.Delivery;
-using Net.Qiujuer.Blink.Tool;
 using System;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
@@ -10,7 +9,7 @@ namespace Net.Qiujuer.Blink.Async
     /// <summary>
     /// Provides a thread for performing send dispatch from a queue of BinkConn {@link BlinkConn}.
     /// </summary>
-    public class SendDispatcher : SocketAsyncEventArgs, IDestroy
+    public class SendDispatcher : SocketAsyncEventArgs
     {
         private const int HeadSize = 11;
         /// <summary>
@@ -21,18 +20,18 @@ namespace Net.Qiujuer.Blink.Async
         /// <summary>
         /// The sender interface for processing sender requests.
         /// </summary>
-        private ISender mSender;
+        private Sender mSender;
 
         /// <summary>
         /// Posting send responses.
         /// </summary>
-        private ISendDelivery mDelivery;
+        private SendDelivery mDelivery;
 
         /// <summary>
         /// Used for telling us to die.
         /// </summary>
         private volatile bool mSending = false;
-        private volatile bool mDestroied = false;
+        private volatile bool mDisposed = false;
 
         private SendPacket mSendPacket;
         private long mCursor;
@@ -41,7 +40,7 @@ namespace Net.Qiujuer.Blink.Async
         private bool mSendStatus;
 
 
-        public SendDispatcher(ISender sender, ISendDelivery delivery)
+        public SendDispatcher(Sender sender, SendDelivery delivery)
         {
             mQueue = new ConcurrentQueue<SendPacket>();
             mSender = sender;
@@ -66,7 +65,7 @@ namespace Net.Qiujuer.Blink.Async
 
         private void SendAsync(int offset, int count)
         {
-            if (mDestroied)
+            if (mDisposed)
                 return;
 
             if (count <= 0)
@@ -99,7 +98,7 @@ namespace Net.Qiujuer.Blink.Async
                 packet.EndPacket();
 
                 // Post End
-                ISendDelivery delivery = mDelivery;
+                SendDelivery delivery = mDelivery;
                 if (delivery != null)
                 {
                     packet.SetSuccess(mSendStatus);
@@ -128,7 +127,7 @@ namespace Net.Qiujuer.Blink.Async
                 mSendPacket = packet;
 
                 // Post Start
-                ISendDelivery delivery = mDelivery;
+                SendDelivery delivery = mDelivery;
                 if (delivery != null)
                     delivery.PostSendProgress(packet, 0);
 
@@ -182,7 +181,7 @@ namespace Net.Qiujuer.Blink.Async
                 if (mProgress != progress)
                 {
                     mProgress = progress;
-                    ISendDelivery delivery = mDelivery;
+                    SendDelivery delivery = mDelivery;
                     if (delivery != null)
                         delivery.PostSendProgress(packet, mProgress);
                 }
@@ -207,23 +206,23 @@ namespace Net.Qiujuer.Blink.Async
             }
             else
             {
-                Destroy();
+                Dispose();
             }
         }
 
-        public void Destroy()
+        public new void Dispose()
         {
-            if (!mDestroied)
+            if (!mDisposed)
             {
-                mDestroied = true;
+                mDisposed = true;
 
                 SendPacket packet = mSendPacket;
                 mSendPacket = null;
 
-                ISendDelivery delivery = mDelivery;
+                SendDelivery delivery = mDelivery;
                 mDelivery = null;
 
-                ISender sender = mSender;
+                Sender sender = mSender;
                 mSender = null;
 
                 if (packet != null && delivery != null)
@@ -237,7 +236,7 @@ namespace Net.Qiujuer.Blink.Async
                 }
 
                 if (sender != null)
-                    sender.Destroy();
+                    sender.Dispose();
                 try
                 {
                     SetBuffer(null, 0, 0);
@@ -247,8 +246,9 @@ namespace Net.Qiujuer.Blink.Async
                 // Clear
                 while (mQueue.TryDequeue(out packet)) { }
 
-                Dispose();
+                base.Dispose();
             }
+
         }
     }
 }

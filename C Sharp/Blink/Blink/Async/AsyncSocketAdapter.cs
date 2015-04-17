@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace Net.Qiujuer.Blink.Async
 {
-    public class AsyncSocketAdapter : ISender, IReceiver
+    public class AsyncSocketAdapter : Sender, Receiver
     {
         private int mBufferSize;
         private Socket mSocket;
@@ -40,7 +40,7 @@ namespace Net.Qiujuer.Blink.Async
             return mBufferSize;
         }
 
-        public void Destroy()
+        public void Dispose()
         {
             Socket socket = mSocket;
             mSocket = null;

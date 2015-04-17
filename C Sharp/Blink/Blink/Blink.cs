@@ -1,5 +1,6 @@
 ﻿using Net.Qiujuer.Blink.Async;
 using Net.Qiujuer.Blink.Core;
+using Net.Qiujuer.Blink.Kit;
 using Net.Qiujuer.Blink.Listener;
 using Net.Qiujuer.Blink.Listener.Delivery;
 using System;
@@ -34,7 +35,7 @@ namespace Net.Qiujuer.Blink
         {
             String path = Path.Combine(resourcePath, DEFAULT_RESOURCE_DIR);
             DiskResource resource = new DiskResource(path, fileMark);
-            BlinkParser parser = new BlinkParser(resource);
+            BlinkParserImpl parser = new BlinkParserImpl(resource);
             AsyncSocketAdapter socketAdapter = new AsyncSocketAdapter(socket, socketBufferSize);
             DelegateDelivery delivery = new DelegateDelivery(listener);
             return new BlinkConn(socketAdapter, delivery, socketAdapter, delivery, resource, parser);
