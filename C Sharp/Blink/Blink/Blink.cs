@@ -16,7 +16,7 @@ namespace Net.Qiujuer.Blink
         private static readonly String DEFAULT_RESOURCE_DIR = "Blink";
         // Default buffer size
         private static readonly int DEFAULT_SOCKET_BUFFER_SIZE = 4 * 1024 * 1024;
-        // Default progress pr
+        // Default progress precision
         private static readonly float DEFAULT_PROGRESS_PRECISION = 0.001f;
 
 
