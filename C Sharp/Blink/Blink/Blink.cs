@@ -1,8 +1,8 @@
 ﻿using Net.Qiujuer.Blink.Async;
+using Net.Qiujuer.Blink.Box;
 using Net.Qiujuer.Blink.Core;
 using Net.Qiujuer.Blink.Kit;
 using Net.Qiujuer.Blink.Listener;
-using Net.Qiujuer.Blink.Listener.Delivery;
 using System;
 using System.IO;
 using System.Net.Sockets;
@@ -11,101 +11,116 @@ namespace Net.Qiujuer.Blink
 {
     public class Blink
     {
-        /**
-     * Default on-disk resource directory.
-     */
-        private static readonly String DEFAULT_RESOURCE_DIR = "Blink";
-        /**
-         * Default buffer size
-         */
-        private static readonly int DEFAULT_SOCKET_BUFFER_SIZE = 4 * 1024 * 1024;
 
-        /**
-         * Create a Bink connection by socket
-         *
-         * @param socket           Socket
-         * @param socketBufferSize Socket BufferSize
-         * @param resourcePath     File Resource Path
-         * @param fileMark         File name mark to clear
-         * @param listener         ReceiveListener
-         * @return BlinkConn
-         * @throws Exception
-         */
-        public static BlinkConn NewConnection(Socket socket, int socketBufferSize, String resourcePath, String fileMark, BlinkListener listener)
+        // Default on-disk resource directory.
+        private static readonly String DEFAULT_RESOURCE_DIR = "Blink";
+        // Default buffer size
+        private static readonly int DEFAULT_SOCKET_BUFFER_SIZE = 4 * 1024 * 1024;
+        // Default progress pr
+        private static readonly float DEFAULT_PROGRESS_PRECISION = 0.001f;
+
+
+        /// <summary>
+        /// Create a Bink connection by socket
+        /// </summary>
+        /// <param name="socket">Socket</param>
+        /// <param name="socketBufferSize">Socket BufferSize</param>
+        /// <param name="resourcePath">File Resource Path</param>
+        /// <param name="fileMark">File name mark to clear and create</param>
+        /// <param name="progressPrecision">Send and Receive notify progress precision</param>
+        /// <param name="receiveListener">ReceiveListener</param>
+        /// <param name="blinkListener">BlinkListener</param>
+        /// <returns>BlinkConn</returns>
+        public static BlinkConn NewConnection(
+            Socket socket,
+            int socketBufferSize,
+            String resourcePath,
+            String fileMark,
+            float progressPrecision,
+            ReceiveListener receiveListener,
+            BlinkListener blinkListener)
         {
             String path = Path.Combine(resourcePath, DEFAULT_RESOURCE_DIR);
             DiskResource resource = new DiskResource(path, fileMark);
             BlinkParserImpl parser = new BlinkParserImpl(resource);
             AsyncSocketAdapter socketAdapter = new AsyncSocketAdapter(socket, socketBufferSize);
-            DelegateDelivery delivery = new DelegateDelivery(listener);
-            return new BlinkConn(socketAdapter, delivery, socketAdapter, delivery, resource, parser);
+            DelegateDelivery delivery = new DelegateDelivery(blinkListener, receiveListener);
+            return new BlinkConn(socketAdapter, socketAdapter, delivery, delivery, delivery, resource, parser, progressPrecision);
         }
 
-        /**
-         * Create a Bink connection by socket
-         *
-         * @param socket       Socket
-         * @param resourcePath File Resource Path
-         * @param fileMark     File name mark to clear
-         * @param listener     ReceiveListener
-         * @return BlinkConn
-         * @throws Exception
-         */
-        public static BlinkConn NewConnection(Socket socket, String resourcePath, String fileMark, BlinkListener listener)
+        /// <summary>
+        /// Create a Bink connection by socket
+        /// </summary>
+        /// <param name="socket">Socket</param>
+        /// <param name="resourcePath">File Resource Path</param>
+        /// <param name="fileMark">File name mark to clear and create</param>
+        /// <param name="progressPrecision">Send and Receive notify progress precision</param>
+        /// <param name="receiveListener">ReceiveListener</param>
+        /// <param name="blinkListener">BlinkListener</param>
+        /// <returns>BlinkConn</returns>
+        public static BlinkConn NewConnection(
+            Socket socket,
+            String resourcePath,
+            String fileMark,
+            float progressPrecision,
+            ReceiveListener receiveListener,
+            BlinkListener blinkListener)
         {
-            return NewConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, resourcePath, fileMark, listener);
+            return NewConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, resourcePath, fileMark, progressPrecision, receiveListener, blinkListener);
         }
 
-        /**
-         * Create a Bink connection by socket
-         *
-         * @param socket           Socket
-         * @param socketBufferSize Socket BufferSize
-         * @param resourcePath     File Resource Path
-         * @param listener         ReceiveListener
-         * @return BlinkConn
-         * @throws Exception
-         */
-        public static BlinkConn NewConnection(Socket socket, int socketBufferSize, String resourcePath, BlinkListener listener)
+        /// <summary>
+        /// Create a Bink connection by socket
+        /// </summary>
+        /// <param name="socket">Socket</param>
+        /// <param name="resourcePath">File Resource Path</param>
+        /// <param name="progressPrecision">Send and Receive notify progress precision</param>
+        /// <param name="receiveListener">ReceiveListener</param>
+        /// <param name="blinkListener">BlinkListener</param>
+        /// <returns>BlinkConn</returns>
+        public static BlinkConn NewConnection(
+            Socket socket,
+            int socketBufferSize,
+            String resourcePath,
+            float progressPrecision,
+            ReceiveListener receiveListener,
+            BlinkListener blinkListener)
         {
-            return NewConnection(socket, socketBufferSize, resourcePath, Guid.NewGuid().ToString(), listener);
+            return NewConnection(socket, socketBufferSize, resourcePath, Guid.NewGuid().ToString(), progressPrecision, receiveListener, blinkListener);
         }
 
-        /**
-         * Create a Bink connection by socket
-         *
-         * @param socket       Socket
-         * @param resourcePath File Resource Path
-         * @param listener     ReceiveListener
-         * @return BlinkConn
-         * @throws Exception
-         */
-        public static BlinkConn NewConnection(Socket socket, String resourcePath, BlinkListener listener)
+        /// <summary>
+        /// Create a Bink connection by socket
+        /// </summary>
+        /// <param name="socket">Socket</param>
+        /// <param name="resourcePath">File Resource Path</param>
+        /// <param name="receiveListener">ReceiveListener</param>
+        /// <param name="blinkListener">BlinkListener</param>
+        /// <returns>BlinkConn</returns>
+        public static BlinkConn NewConnection(Socket socket, String resourcePath, ReceiveListener receiveListener, BlinkListener blinkListener)
         {
-            return NewConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, resourcePath, Guid.NewGuid().ToString(), listener);
+            return NewConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, resourcePath, Guid.NewGuid().ToString(), DEFAULT_PROGRESS_PRECISION, receiveListener, blinkListener);
         }
 
-        /**
-         * Create a Bink connection by socket
-         *
-         * @param socket   Socket
-         * @param listener ReceiveListener
-         * @return BlinkConn
-         * @throws Exception
-         */
-        public static BlinkConn NewConnection(Socket socket, BlinkListener listener)
+
+        /// <summary>
+        /// Create a Bink connection by socket
+        /// </summary>
+        /// <param name="socket">Socket</param>
+        /// <param name="receiveListener">ReceiveListener</param>
+        /// <param name="blinkListener">BlinkListener</param>
+        /// <returns>BlinkConn</returns>
+        public static BlinkConn NewConnection(Socket socket, ReceiveListener receiveListener, BlinkListener blinkListener)
         {
-            return NewConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, getDefaultResourcePath(), Guid.NewGuid().ToString(), listener);
+            return NewConnection(socket, DEFAULT_SOCKET_BUFFER_SIZE, GetDefaultResourcePath(), Guid.NewGuid().ToString(), DEFAULT_PROGRESS_PRECISION, receiveListener, blinkListener);
         }
 
 
-        /**
-         * Get Default path with CanonicalPath
-         *
-         * @return Path
-         * @throws IOException
-         */
-        private static String getDefaultResourcePath()
+        /// <summary>
+        /// Get Default path with CanonicalPath
+        /// </summary>
+        /// <returns>Path</returns>
+        private static String GetDefaultResourcePath()
         {
             return System.IO.Directory.GetCurrentDirectory();
         }

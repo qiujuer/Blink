@@ -7,33 +7,32 @@ using System.Threading.Tasks;
 
 namespace Net.Qiujuer.Blink.Core
 {
-    /**
-     * Blink files Resource
-     */
+    /// <summary>
+    /// Blink Files Resource
+    /// </summary>
     public interface Resource
     {
-        /**
-         * Create a file from resource.
-         *
-         * @return New file
-         */
-        String Create(long id);
+        /// <summary>
+        /// Create a file from resource.
+        /// </summary>
+        /// <param name="id">Packet Id</param>
+        /// <returns>File Path</returns>
+        string Create(long id);
 
-        /**
-         * Empties the resource by oneself
-         */
+        /// <summary>
+        /// Empties the resource by oneself
+        /// </summary>
         void Clear();
 
-        /**
-         * Empties the resource by the path
-         */
+        /// <summary>
+        /// Empties the resource by the path
+        /// </summary>
         void ClearAll();
 
-        /**
-         * Get the Mark
-         *
-         * @return T
-         */
+        /// <summary>
+        /// Get The Mark
+        /// </summary>
+        /// <returns>Receive Mark</returns>
         string GetMark();
     }
 }

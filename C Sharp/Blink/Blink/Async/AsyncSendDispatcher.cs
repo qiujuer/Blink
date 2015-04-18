@@ -1,5 +1,4 @@
 ﻿using Net.Qiujuer.Blink.Core;
-using Net.Qiujuer.Blink.Listener.Delivery;
 using System;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
@@ -7,11 +6,10 @@ using System.Net.Sockets;
 namespace Net.Qiujuer.Blink.Async
 {
     /// <summary>
-    /// Provides a thread for performing send dispatch from a queue of BinkConn {@link BlinkConn}.
+    /// Provides for performing send dispatch from a queue of BinkConn {@link BlinkConn}.
     /// </summary>
-    public class SendDispatcher : SocketAsyncEventArgs
+    public class AsyncSendDispatcher : AsyncAbsDispatcher
     {
-        private const int HeadSize = 11;
         /// <summary>
         /// The queue of send entity.
         /// </summary>
@@ -31,16 +29,14 @@ namespace Net.Qiujuer.Blink.Async
         /// Used for telling us to die.
         /// </summary>
         private volatile bool mSending = false;
-        private volatile bool mDisposed = false;
 
         private SendPacket mSendPacket;
         private long mCursor;
         private long mTotal;
-        private float mProgress;
-        private bool mSendStatus;
 
 
-        public SendDispatcher(Sender sender, SendDelivery delivery)
+        public AsyncSendDispatcher(Sender sender, SendDelivery delivery, float progressPrecision)
+            : base(progressPrecision)
         {
             mQueue = new ConcurrentQueue<SendPacket>();
             mSender = sender;
@@ -50,9 +46,9 @@ namespace Net.Qiujuer.Blink.Async
             SetBuffer(new byte[sender.GetBufferSize()], 0, sender.GetBufferSize());
         }
 
-        public void Send(SendPacket entity)
+        public void Send(SendPacket packet)
         {
-            mQueue.Enqueue(entity);
+            mQueue.Enqueue(packet);
 
             if (!mSending)
             {
@@ -61,6 +57,11 @@ namespace Net.Qiujuer.Blink.Async
                 // Send Next
                 SendNext();
             }
+        }
+
+        public void Cancel(SendPacket packet)
+        {
+            // Wait.....
         }
 
         private void SendAsync(int offset, int count)
@@ -75,8 +76,8 @@ namespace Net.Qiujuer.Blink.Async
             SetBuffer(offset, count);
 
             // As soon as the client is connected, post a receive to the connection
-            mSendStatus = mSender.SendAsync(this);
-            if (!mSendStatus)
+            mStatus = mSender.SendAsync(this);
+            if (!mStatus)
             {
                 OnCompleted(this);
             }
@@ -85,7 +86,7 @@ namespace Net.Qiujuer.Blink.Async
         private void SendNext()
         {
             // Set Status
-            mSendStatus = mCursor == mTotal;
+            mStatus = mCursor == mTotal;
 
 
             SendPacket packet = mSendPacket;
@@ -95,22 +96,21 @@ namespace Net.Qiujuer.Blink.Async
             if (packet != null)
             {
                 // End
+                packet.SetSuccess(mStatus);
                 packet.EndPacket();
 
                 // Post End
                 SendDelivery delivery = mDelivery;
-                if (delivery != null)
+                if (delivery != null && mProgress != 1)
                 {
-                    packet.SetSuccess(mSendStatus);
                     delivery.PostSendProgress(packet, 1);
                 }
-
-                packet = null;
             }
 
             // Init Size
             mCursor = 0;
             mTotal = 0;
+            mProgress = 0;
 
             // Take a request from the queue.
             mSending = mQueue.TryDequeue(out packet);
@@ -135,7 +135,7 @@ namespace Net.Qiujuer.Blink.Async
                 packet.StartPacket();
 
                 // Send
-                mSendStatus = SendHead(packet);
+                mStatus = SendHead(packet);
 
             }
         }
@@ -147,7 +147,7 @@ namespace Net.Qiujuer.Blink.Async
                 return false;
 
             // Type
-            Buffer[0] = (byte)entity.GetType();
+            Buffer[0] = entity.GetPacketType();
 
             // Length
             byte[] lenBytes = BitConverter.GetBytes(mTotal);
@@ -175,17 +175,18 @@ namespace Net.Qiujuer.Blink.Async
                 // Send
                 SendAsync(0, count);
 
-                // Progress
-                float progress = (float)Math.Round((float)mCursor / mTotal, 2);
-                // Post Callback
-                if (mProgress != progress)
+
+                SendDelivery delivery = mDelivery;
+                if (delivery != null)
                 {
-                    mProgress = progress;
-                    SendDelivery delivery = mDelivery;
-                    if (delivery != null)
+                    // Progress
+                    float progress = (float)mCursor / mTotal;
+                    // Post Callback
+                    if (IsNotifyProgress(progress))
                         delivery.PostSendProgress(packet, mProgress);
                 }
             }
+
         }
 
         protected override void OnCompleted(SocketAsyncEventArgs e)
@@ -212,10 +213,8 @@ namespace Net.Qiujuer.Blink.Async
 
         public new void Dispose()
         {
-            if (!mDisposed)
+            if (!IsDisposed())
             {
-                mDisposed = true;
-
                 SendPacket packet = mSendPacket;
                 mSendPacket = null;
 

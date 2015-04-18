@@ -58,7 +58,7 @@ namespace Net.Qiujuer.Blink.Box
             }
         }
 
-        public override void Write(byte[] buffer, int offset, int count)
+        internal override void Write(byte[] buffer, int offset, int count)
         {
             base.Write(buffer, offset, count);
 
@@ -69,7 +69,7 @@ namespace Net.Qiujuer.Blink.Box
 
         }
 
-        public override void WriteInfo(byte[] buffer, int offset, int count)
+        internal override void WriteInfo(byte[] buffer, int offset, int count)
         {
             try
             {

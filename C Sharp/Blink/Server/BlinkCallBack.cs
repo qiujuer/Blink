@@ -6,9 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 
-namespace Sample
+namespace Server
 {
-    class BlinkCallBack : BlinkListener
+    class BlinkCallBack : BlinkListener, ReceiveListener
     {
         static List<BlinkCallBack> mBlinkCallBacks = new List<BlinkCallBack>();
 
@@ -21,30 +21,32 @@ namespace Sample
             Conn = Blink.NewConnection(socket,
                 2 * 1024 * 1024,
                 "D:/",
-                Guid.NewGuid().ToString(), this);
+                Guid.NewGuid().ToString(),
+                0.1f,
+                this, this);
 
             mBlinkCallBacks.Add(this);
         }
 
 
-        public void OnReceiveStart(int type, long id)
+        public void OnReceiveStart(byte type, long id)
         {
             Console.WriteLine("Receive->start:" + type + " " + id);
         }
 
         public void OnReceiveProgress(ReceivePacket paket, float progress)
         {
-            Console.WriteLine("Receive->progress:" + paket.GetType() + " " + paket.GetId()
+            Console.WriteLine("Receive->progress:" + paket.GetPacketType() + " " + paket.GetId()
                          + " " + paket.GetLength() + " " + progress);
         }
 
         public void OnReceiveEnd(ReceivePacket paket)
         {
-            if (paket.GetType() == BlinkPacketImpl.PacketType.STRING)
+            if (paket.GetPacketType() == BlinkPacket.PacketType.STRING)
                 Console.WriteLine("Receive->end: String:"
                         + paket.GetId() + " " + paket.GetLength() + " :"
                         + ((StringReceivePacket)paket).GetEntity());
-            else if (paket.GetType() == BlinkPacketImpl.PacketType.BYTES)
+            else if (paket.GetPacketType() == BlinkPacket.PacketType.BYTES)
                 Console.WriteLine("Receive->end: Bytes:"
                         + paket.GetId() + " " + paket.GetLength() + " :"
                         + ((ByteReceivePacket)paket).GetEntity());

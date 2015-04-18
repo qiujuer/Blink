@@ -36,7 +36,7 @@ namespace Net.Qiujuer.Blink.Box
             CloseStream();
         }
 
-        public override short ReadInfo(byte[] buffer, int index)
+        internal override short ReadInfo(byte[] buffer, int index)
         {
             try
             {

@@ -1,13 +1,14 @@
 ﻿using Net.Qiujuer.Blink.Core;
-using Net.Qiujuer.Blink.Listener.Delivery;
 using System;
 using System.Net.Sockets;
 
 namespace Net.Qiujuer.Blink.Async
 {
-    public class ReceiveDispatcher : SocketAsyncEventArgs
+    /// <summary>
+    /// Provides for performing receive dispatch from a queue of BinkConn {@link BlinkConn}.
+    /// </summary>
+    public class AsyncReceiveDispatcher : AsyncAbsDispatcher
     {
-        private const int HeadSize = 11;
         /// <summary>
         /// Socket receive buffer size
         /// </summary>
@@ -23,23 +24,22 @@ namespace Net.Qiujuer.Blink.Async
         /// <summary>
         /// Posting responses.
         /// </summary>
-        private ReceiveDelivery mDelivery;
-
-        private volatile bool mDisposed = false;
+        private ReceiveDelivery mReceiveDelivery;
+        private BlinkDelivery mBlinkDelivery;
 
         private ReceivePacket mReceivePacket;
         private short mSurplusInfoLen;
         private long mSurplusLen;
-        private float mProgress;
-        private bool mReceiveStatus;
 
 
-        public ReceiveDispatcher(Receiver receiver, BlinkParser parser, ReceiveDelivery delivery)
+        public AsyncReceiveDispatcher(Receiver receiver, BlinkParser parser, ReceiveDelivery receiveDelivery, BlinkDelivery blinkDelivery, float progressPrecision)
+            : base(progressPrecision)
         {
             mReceiver = receiver;
             mBufferSize = receiver.GetBufferSize();
             mParser = parser;
-            mDelivery = delivery;
+            mReceiveDelivery = receiveDelivery;
+            mBlinkDelivery = blinkDelivery;
 
             // Set Buffer
             SetBuffer(new byte[mBufferSize], 0, mBufferSize);
@@ -70,8 +70,8 @@ namespace Net.Qiujuer.Blink.Async
             SetBuffer(offset, count);
 
             // Post a receive to the connection
-            mReceiveStatus = mReceiver.ReceiveAsync(this);
-            if (!mReceiveStatus)
+            mStatus = mReceiver.ReceiveAsync(this);
+            if (!mStatus)
             {
                 // On sync call
                 OnCompleted(this);
@@ -82,6 +82,8 @@ namespace Net.Qiujuer.Blink.Async
         {
             mSurplusLen = 0;
             mSurplusInfoLen = 0;
+            mProgress = 0;
+
             byte type = buffer[0];
             long len = BitConverter.ToInt64(buffer, 1);
             short info = BitConverter.ToInt16(buffer, HeadSize - 2);
@@ -100,7 +102,7 @@ namespace Net.Qiujuer.Blink.Async
                     mReceivePacket = packet;
 
                     // Notifly
-                    ReceiveDelivery delivery = mDelivery;
+                    ReceiveDelivery delivery = mReceiveDelivery;
                     if (delivery != null)
                         delivery.PostReceiveStart(packet);
 
@@ -152,17 +154,14 @@ namespace Net.Qiujuer.Blink.Async
 
 
                 // Notity progress
-                long len = packet.GetLength();
-                float progress = (float)Math.Round((float)(len - mSurplusLen) / len, 8);
+                float len = packet.GetLength();
+                float progress = (len - mSurplusLen) / len;
 
                 // Post Callback
+                ReceiveDelivery delivery = mReceiveDelivery;
 
-                ReceiveDelivery delivery = mDelivery;
-
-                if (mProgress != progress)
+                if (IsNotifyProgress(progress))
                 {
-                    mProgress = progress;
-
                     // Notify                    
                     if (delivery != null)
                         delivery.PostReceiveProgress(packet, mProgress);
@@ -175,7 +174,7 @@ namespace Net.Qiujuer.Blink.Async
 
                     // Notify
                     if (delivery != null)
-                        delivery.PostReceiveEnd(packet, mReceiveStatus);
+                        delivery.PostReceiveEnd(packet, mStatus);
 
                     // Set Null
                     mReceivePacket = null;
@@ -219,10 +218,8 @@ namespace Net.Qiujuer.Blink.Async
 
         public new void Dispose()
         {
-            if (!mDisposed)
+            if (!IsDisposed())
             {
-                mDisposed = true;
-
                 mParser = null;
 
                 ReceivePacket packet = mReceivePacket;
@@ -231,23 +228,25 @@ namespace Net.Qiujuer.Blink.Async
                 Receiver receiver = mReceiver;
                 mReceiver = null;
 
-                ReceiveDelivery delivery = mDelivery;
-                mDelivery = null;
+                ReceiveDelivery receiveDelivery = mReceiveDelivery;
+                mReceiveDelivery = null;
 
-                if (packet != null && delivery != null)
+                if (packet != null && receiveDelivery != null)
                 {
                     if (mSurplusLen > 0)
                     {
                         packet.EndPacket();
-                        delivery.PostReceiveEnd(packet, false);
+                        receiveDelivery.PostReceiveEnd(packet, false);
                     }
                 }
 
+                BlinkDelivery blinkDelay = mBlinkDelivery;
+                mBlinkDelivery = null;
+                if (blinkDelay != null)
+                    blinkDelay.PostBlinkDisconnect();
+
                 if (receiver != null)
                     receiver.Dispose();
-
-                if (delivery != null)
-                    delivery.PostBlinkDisconnect();
 
                 SetBuffer(null, 0, 0);
 

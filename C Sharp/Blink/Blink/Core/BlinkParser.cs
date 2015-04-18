@@ -13,6 +13,12 @@ namespace Net.Qiujuer.Blink.Core
     /// </summary>
     public interface BlinkParser
     {
+        /// <summary>
+        /// Parse receiver receive data
+        /// </summary>
+        /// <param name="type">Data type</param>
+        /// <param name="len">Data Len</param>
+        /// <returns>ReceivePacket</returns>
         ReceivePacket ParseReceive(byte type, long len);
     }
 }

@@ -19,7 +19,7 @@ namespace Net.Qiujuer.Blink.Box
             return mEntity;
         }
 
-        public override void Write(byte[] buffer, int offset, int count)
+        internal override void Write(byte[] buffer, int offset, int count)
         {
             Stream stream = mStream;
             if (stream != null)

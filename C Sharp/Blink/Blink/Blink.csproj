@@ -40,11 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Async\AsyncAbsDispatcher.cs" />
     <Compile Include="Async\AsyncSocketAdapter.cs" />
-    <Compile Include="Async\ReceiveDispatcher.cs" />
-    <Compile Include="Async\SendDispatcher.cs" />
+    <Compile Include="Async\AsyncReceiveDispatcher.cs" />
+    <Compile Include="Async\AsyncSendDispatcher.cs" />
     <Compile Include="Async\SocketAsyncEventArgsPool.cs" />
     <Compile Include="Blink.cs" />
+    <Compile Include="Core\ReceiveDelivery.cs" />
     <Compile Include="Kit\BlinkLog.cs" />
     <Compile Include="Box\ByteReceivePacket.cs" />
     <Compile Include="Box\ByteSendPacket.cs" />
@@ -54,25 +56,26 @@
     <Compile Include="Box\StringSendPacket.cs" />
     <Compile Include="Box\BaseReceivePacket.cs" />
     <Compile Include="Core\BlinkConn.cs" />
-    <Compile Include="Core\BlinkPacketImpl.cs" />
-    <Compile Include="Box\BaseSendPacket.cs" />
-    <Compile Include="Core\BlinkParserImpl.cs" />
     <Compile Include="Core\BlinkPacket.cs" />
-    <Compile Include="Listener\Delivery\ReceiveDelivery.cs" />
+    <Compile Include="Box\BaseSendPacket.cs" />
+    <Compile Include="Kit\BlinkParserImpl.cs" />
+    <Compile Include="Core\Packet.cs" />
+    <Compile Include="Core\BlinkDelivery.cs" />
     <Compile Include="Core\ReceivePacket.cs" />
     <Compile Include="Core\BlinkParser.cs" />
     <Compile Include="Core\Receiver.cs" />
     <Compile Include="Core\Resource.cs" />
-    <Compile Include="Listener\Delivery\SendDelivery.cs" />
+    <Compile Include="Core\SendDelivery.cs" />
     <Compile Include="Core\Sender.cs" />
     <Compile Include="Core\SendPacket.cs" />
     <Compile Include="Kit\DiskResource.cs" />
-    <Compile Include="Listener\Delivery\ExecutorDelivery.cs" />
+    <Compile Include="Kit\EventDelivery.cs" />
     <Compile Include="Listener\BlinkListener.cs" />
+    <Compile Include="Listener\ReceiveListener.cs" />
     <Compile Include="Listener\SendListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Listener\Delivery\DelegateDelivery.cs" />
-    <Compile Include="Listener\Delivery\TaskDelivery.cs" />
+    <Compile Include="Kit\DelegateDelivery.cs" />
+    <Compile Include="Kit\CallBackDelivery.cs" />
     <Compile Include="Kit\Runnable.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

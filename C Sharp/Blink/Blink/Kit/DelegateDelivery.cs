@@ -1,22 +1,24 @@
 ﻿using Net.Qiujuer.Blink.Core;
+using Net.Qiujuer.Blink.Listener;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Net.Qiujuer.Blink.Listener.Delivery
+namespace Net.Qiujuer.Blink.Kit
 {
-    class DelegateDelivery : ReceiveDelivery, SendDelivery
+    class DelegateDelivery : BlinkDelivery, SendDelivery, ReceiveDelivery
     {
-        private delegate void Progress();
-
         private BlinkListener mBlinkListener;
+        private ReceiveListener mReceiveListener;
+
         private ConcurrentQueue<Action> mQueue = new ConcurrentQueue<Action>();
         private volatile bool IsNotify = false;
 
-        public DelegateDelivery(BlinkListener listener)
+        public DelegateDelivery(BlinkListener blinkListener, ReceiveListener receiveListener)
         {
-            mBlinkListener = listener;
+            mBlinkListener = blinkListener;
+            mReceiveListener = receiveListener;
         }
 
         private void Run()
@@ -44,19 +46,19 @@ namespace Net.Qiujuer.Blink.Listener.Delivery
 
         public void PostReceiveStart(ReceivePacket entity)
         {
-            BlinkListener listener = mBlinkListener;
+            ReceiveListener listener = mReceiveListener;
             if (listener != null && entity != null)
             {
                 PostQueue(() =>
                 {
-                    listener.OnReceiveStart(entity.GetType(), entity.GetId());
+                    listener.OnReceiveStart(entity.GetPacketType(), entity.GetId());
                 });
             }
         }
 
         public void PostReceiveEnd(ReceivePacket entity, bool isSuccess)
         {
-            BlinkListener listener = mBlinkListener;
+            ReceiveListener listener = mReceiveListener;
             if (listener != null && entity != null)
             {
                 entity.SetSuccess(isSuccess);
@@ -69,7 +71,7 @@ namespace Net.Qiujuer.Blink.Listener.Delivery
 
         public void PostReceiveProgress(ReceivePacket entity, float progress)
         {
-            BlinkListener listener = mBlinkListener;
+            ReceiveListener listener = mReceiveListener;
             if (listener != null && entity != null)
             {
                 PostQueue(() =>

@@ -1,7 +1,6 @@
 ﻿using Net.Qiujuer.Blink.Async;
 using Net.Qiujuer.Blink.Box;
 using Net.Qiujuer.Blink.Listener;
-using Net.Qiujuer.Blink.Listener.Delivery;
 using System;
 using System.IO;
 
@@ -10,22 +9,24 @@ namespace Net.Qiujuer.Blink.Core
     public class BlinkConn : IDisposable
     {
         private readonly Sender mSender;
-
-        private readonly SendDelivery mSendDelivery;
-
         private readonly Receiver mReceiver;
-
+        private readonly SendDelivery mSendDelivery;
         private readonly ReceiveDelivery mReceiveDelivery;
-
+        private readonly BlinkDelivery mBlinkDelivery;
         private readonly Resource mResource;
-
         private readonly BlinkParser mParser;
+        private AsyncSendDispatcher mSendDispatcher;
+        private AsyncReceiveDispatcher mReceiveDispatcher;
 
-        private SendDispatcher mSendDispatcher;
-        private ReceiveDispatcher mReceiveDispatcher;
 
-
-        public BlinkConn(Sender sender, SendDelivery sendDelivery, Receiver receiver, ReceiveDelivery receiveDelivery, Resource resource, BlinkParser parser)
+        public BlinkConn(Sender sender,
+            Receiver receiver,
+            SendDelivery sendDelivery,
+            ReceiveDelivery receiveDelivery,
+            BlinkDelivery blinkDelivery,
+            Resource resource,
+            BlinkParser parser,
+            float progressPrecision)
         {
             mSender = sender;
             mReceiver = receiver;
@@ -33,34 +34,35 @@ namespace Net.Qiujuer.Blink.Core
 
             mSendDelivery = sendDelivery;
             mReceiveDelivery = receiveDelivery;
+            mBlinkDelivery = blinkDelivery;
 
             mParser = parser;
 
             // Init this
-            Init();
+            Init(progressPrecision);
         }
 
-        /**
-         * Starts the dispatchers in this queue.
-         */
-        private void Init()
+        /// <summary>
+        /// Starts the dispatchers in this queue.
+        /// </summary>
+        private void Init(float progressPrecision)
         {
             // Create the cache dispatcher and start it.
-            mSendDispatcher = new SendDispatcher(mSender, mSendDelivery);
+            mSendDispatcher = new AsyncSendDispatcher(mSender, mSendDelivery, progressPrecision);
 
-            mReceiveDispatcher = new ReceiveDispatcher(mReceiver, mParser, mReceiveDelivery);
+            mReceiveDispatcher = new AsyncReceiveDispatcher(mReceiver, mParser, mReceiveDelivery, mBlinkDelivery, progressPrecision);
         }
 
-        /**
-         * Stops the cache and network dispatchers.
-         */
+        /// <summary>
+        /// Stops the cache and network dispatchers.
+        /// </summary>
         public void Dispose()
         {
             if (mSendDelivery != null)
                 mSendDelivery.Dispose();
 
-            if (mReceiveDelivery != null)
-                mReceiveDelivery.Dispose();
+            if (mBlinkDelivery != null)
+                mBlinkDelivery.Dispose();
 
             if (mSender != null)
                 mSender.Dispose();
@@ -76,50 +78,47 @@ namespace Net.Qiujuer.Blink.Core
 
         }
 
-        /**
-         * Get file resource
-         *
-         * @return Resource
-         */
+        /// <summary>
+        /// Get file resource
+        /// </summary>
+        /// <returns>Resource</returns>
         public Resource GetResource()
         {
             return mResource;
         }
 
-        /**
-         * Send a Entity to queue
-         *
-         * @param entity SendEntity<T> {@link SendPacket}
-         * @param <T>    Extends SendEntity
-         * @return SendEntity<T>
-         */
-        public SendPacket Send(SendPacket entity)
+        /// <summary>
+        ///  Send a Entity to queue
+        /// </summary>
+        /// <param name="packet">SendPacket</param>
+        /// <returns>SendPacket</returns>
+        public SendPacket Send(SendPacket packet)
         {
-            entity.SetBlinkConn(this);
+            packet.SetBlinkConn(this);
 
-            mSendDispatcher.Send(entity);
+            mSendDispatcher.Send(packet);
 
-            return entity;
+            return packet;
         }
 
-        /**
-         * Send file to queue
-         *
-         * @param file File
-         * @return FileSendEntity {@link FileSendPacket}
-         */
+
+        /// <summary>
+        /// Send file to queue
+        /// </summary>
+        /// <param name="file">File Info</param>
+        /// <returns>FileSendPacket</returns>
         public FileSendPacket Send(FileInfo file)
         {
             return Send(file, null);
         }
 
-        /**
-         * Send file to queue
-         *
-         * @param file     File
-         * @param listener Callback listener
-         * @return FileSendEntity {@link FileSendPacket}
-         */
+
+        /// <summary>
+        /// Send file to queue
+        /// </summary>
+        /// <param name="file">File Info</param>
+        /// <param name="listener">SendListener</param>
+        /// <returns>FileSendPacket</returns>
         public FileSendPacket Send(FileInfo file, SendListener listener)
         {
             FileSendPacket entity = new FileSendPacket(file, listener);
@@ -138,13 +137,13 @@ namespace Net.Qiujuer.Blink.Core
             return Send(bytes, null);
         }
 
-        /**
-         * Send byte array to queue
-         *
-         * @param bytes    Byte array
-         * @param listener Callback listener
-         * @return ByteSendEntity {@link ByteSendPacket}
-         */
+
+        /// <summary>
+        /// Send byte array to queue
+        /// </summary>
+        /// <param name="bytes"> Byte array</param>
+        /// <param name="listener">Callback listener</param>
+        /// <returns>ByteSendPacket</returns>
         public ByteSendPacket Send(byte[] bytes, SendListener listener)
         {
             ByteSendPacket entity = new ByteSendPacket(bytes, listener);
@@ -152,24 +151,24 @@ namespace Net.Qiujuer.Blink.Core
             return entity;
         }
 
-        /**
-         * Send string to queue
-         *
-         * @param str String msg
-         * @return StringSendEntity {@link StringSendPacket}
-         */
+
+        /// <summary>
+        /// Send string to queue
+        /// </summary>
+        /// <param name="str">String msg</param>
+        /// <returns>StringSendPacket</returns>
         public StringSendPacket Send(String str)
         {
             return Send(str, null);
         }
 
-        /**
-         * Send string to queue
-         *
-         * @param str      String msg
-         * @param listener Callback listener
-         * @return StringSendEntity {@link StringSendPacket}
-         */
+
+        /// <summary>
+        /// Send string to queue
+        /// </summary>
+        /// <param name="str">String msg</param>
+        /// <param name="listener">SendListener</param>
+        /// <returns>StringSendPacket</returns>
         public StringSendPacket Send(String str, SendListener listener)
         {
             StringSendPacket entity = null;
@@ -184,9 +183,10 @@ namespace Net.Qiujuer.Blink.Core
             }
             return entity;
         }
+
         internal void Cancel(SendPacket packet)
         {
-            //mSendQueue.(entity);
+            mSendDispatcher.Cancel(packet);
         }
     }
 }

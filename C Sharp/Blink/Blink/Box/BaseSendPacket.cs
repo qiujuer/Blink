@@ -21,7 +21,7 @@ namespace Net.Qiujuer.Blink.Box
             return mEntity;
         }
 
-        public override int Read(byte[] buffer, int offset, int count)
+        internal override int Read(byte[] buffer, int offset, int count)
         {
             Stream stream = mStream;
             if (stream == null)

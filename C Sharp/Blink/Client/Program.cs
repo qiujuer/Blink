@@ -31,7 +31,7 @@ namespace Client
             {
                 mSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 mSocket.Connect(hostIp, 2626);
-                mBlinkConn = Blink.NewConnection(mSocket, 1024 * 1024, "D:/", Guid.NewGuid().ToString(), null);
+                mBlinkConn = Blink.NewConnection(mSocket, 1024 * 1024, "D:/", Guid.NewGuid().ToString(), 0.01f, null, null);
 
             }
             catch (Exception)
@@ -60,7 +60,7 @@ namespace Client
 
             while (true)
             {
-                BlinkLog.V("=====Enter same str or file path to send server:=====");
+                BlinkLog.V("===== Enter some str or drag file to send. =====");
 
                 string str = Console.ReadLine();
                 if (str == "E")

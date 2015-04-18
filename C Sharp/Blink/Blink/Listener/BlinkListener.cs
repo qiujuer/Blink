@@ -3,16 +3,13 @@ using System.Net.Sockets;
 namespace Net.Qiujuer.Blink.Listener
 {
     /// <summary>
-    /// Receive notify listener
+    /// Blink notify listener
     /// </summary>
     public interface BlinkListener
-    {
-        void OnReceiveStart(int type, long id);
-
-        void OnReceiveProgress(ReceivePacket paket, float progress);
-
-        void OnReceiveEnd(ReceivePacket paket);
-
+    {       
+        /// <summary>
+        /// On Receive or Sender error by socket err call this
+        /// </summary>
         void OnBlinkDisconnect();
     }
 }
