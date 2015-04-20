@@ -65,10 +65,10 @@ public class HandleSelector implements Disposable {
         return instance;
     }
 
-    public static void tryDispose(){
-        if(instance!=null){
+    public static void tryDispose() {
+        if (instance != null) {
             HandleSelector handleSelector = getInstance();
-            if(handleSelector.canDispose()) {
+            if (handleSelector.canDispose()) {
                 handleSelector.dispose();
             }
 

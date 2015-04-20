@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This is a buffer use ByteBuffer {@link ByteBuffer}
- * <p/>
+ * <p>
  * Use to async socket
  */
 public class AsyncEventArgs implements Disposable {
