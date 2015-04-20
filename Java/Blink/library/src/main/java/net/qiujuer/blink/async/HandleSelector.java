@@ -67,11 +67,14 @@ public class HandleSelector implements Disposable {
 
     public static void tryDispose() {
         if (instance != null) {
-            HandleSelector handleSelector = getInstance();
-            if (handleSelector.canDispose()) {
-                handleSelector.dispose();
+            synchronized (HandleSelector.class) {
+                if (instance != null) {
+                    if (instance.canDispose()) {
+                        instance.dispose();
+                        instance = null;
+                    }
+                }
             }
-
         }
     }
 
