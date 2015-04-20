@@ -40,6 +40,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Button mSend;
 
     private BlinkConn mConn = null;
+    private Thread mLinkThread = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +81,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        destroy();
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -129,7 +137,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void linkSocket(final String ip, final String port) {
-        Thread thread = new Thread() {
+        if (mLinkThread != null)
+            return;
+        mLinkThread = new Thread() {
             @Override
             public void run() {
                 try {
@@ -139,11 +149,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     Log.v(TAG, "Bind BlinkConn SocketChannel.");
                 } catch (Exception e) {
                     Log.e(TAG, "Error" + e);
+                } finally {
+                    mLinkThread = null;
                 }
                 refreshStatus();
             }
         };
-        thread.start();
+        mLinkThread.start();
     }
 
     private SocketChannel connectChannel(SocketAddress address) throws Exception {
