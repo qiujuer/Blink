@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import net.qiujuer.blink.Blink;
 import net.qiujuer.blink.box.ByteReceivePacket;
@@ -16,11 +17,16 @@ import net.qiujuer.blink.box.StringReceivePacket;
 import net.qiujuer.blink.core.BlinkConn;
 import net.qiujuer.blink.core.BlinkPacket;
 import net.qiujuer.blink.core.ReceivePacket;
+import net.qiujuer.blink.listener.BlinkListener;
 import net.qiujuer.blink.listener.ReceiveListener;
 
-import java.io.IOException;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
 import java.util.Arrays;
+import java.util.Iterator;
 
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
@@ -33,7 +39,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Button mLink;
     private Button mSend;
 
-    private Socket mSocket = null;
     private BlinkConn mConn = null;
 
     @Override
@@ -128,13 +133,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             @Override
             public void run() {
                 try {
-                    Log.v(TAG, "start socket");
-                    mSocket = new Socket(ip, Integer.parseInt(port));
-                    Log.v(TAG, "start bind Blink");
-                    mConn = bindBlink(mSocket);
-                    Log.v(TAG, "start blink socket.");
+                    Log.v(TAG, "Start socket link...");
+                    SocketChannel channel = connectChannel(new InetSocketAddress(ip, Integer.parseInt(port)));
+                    mConn = bindBlink(channel);
+                    Log.v(TAG, "Bind BlinkConn SocketChannel.");
                 } catch (Exception e) {
-                    Log.e(TAG, "error" + e);
+                    Log.e(TAG, "Error" + e);
                 }
                 refreshStatus();
             }
@@ -142,56 +146,97 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         thread.start();
     }
 
-    private BlinkConn bindBlink(Socket socket) throws Exception {
+    private SocketChannel connectChannel(SocketAddress address) throws Exception {
+        Selector selector = Selector.open();
+
+        SocketChannel channel = SocketChannel.open();
+        channel.configureBlocking(false);
+        channel.connect(address);
+
+        channel.register(selector, SelectionKey.OP_CONNECT);
+
+        while (true) {
+
+            if (selector.select() == 0)
+                continue;
+
+            Iterator ite = selector.selectedKeys().iterator();
+            while (ite.hasNext()) {
+                SelectionKey key = (SelectionKey) ite.next();
+                ite.remove();
+
+                if (key.isConnectable()) {
+                    channel = (SocketChannel) key.channel();
+
+                    // Link
+                    if (channel.isConnectionPending()) {
+                        channel.finishConnect();
+                    }
+
+                    Log.v(TAG, "Client Connected.");
+
+                    // End
+                    key.interestOps(key.readyOps() & ~SelectionKey.OP_CONNECT);
+                    key.cancel();
+
+                    selector.close();
+
+                    return channel;
+                }
+            }
+        }
+    }
+
+    private BlinkConn bindBlink(SocketChannel channel) throws Exception {
         // Receive listener
-        ReceiveListener listener = new ReceiveListener() {
+        ReceiveListener receiveListener = new ReceiveListener() {
             @Override
-            public void onReceiveStart(int type, long id) {
+            public void onReceiveStart(byte type, long id) {
                 Log.v(TAG, "Receive->start:" + type + " " + id);
             }
 
             @Override
-            public void onReceiveProgress(int type, long id, int total, int cur) {
-                Log.v(TAG, "Receive->progress:" + type + " " + id
-                        + " " + total + " " + cur);
+            public void onReceiveProgress(ReceivePacket packet, float progress) {
+                Log.v(TAG, "Receive->progress: " + progress);
             }
 
             @Override
             public void onReceiveEnd(ReceivePacket entity) {
-                if (entity.getType() == BlinkPacket.Type.STRING)
+                if (entity.getPacketType() == BlinkPacket.PacketType.STRING)
                     Log.v(TAG, "Receive->end: String:"
                             + entity.getId() + " " + entity.getLength() + " :"
                             + ((StringReceivePacket) entity).getEntity());
-                else if (entity.getType() == BlinkPacket.Type.BYTES)
+                else if (entity.getPacketType() == BlinkPacket.PacketType.BYTES)
                     Log.v(TAG, "Receive->end: Bytes:"
                             + entity.getId() + " " + entity.getLength() + " :"
                             + Arrays.toString(((ByteReceivePacket) entity).getEntity()));
-                else
+                else if (entity.getPacketType() == BlinkPacket.PacketType.FILE)
                     Log.v(TAG, "Receive->end: File:"
                             + entity.getId()
                             + " "
                             + entity.getLength()
                             + " :"
                             + ((FileReceivePacket) entity).getEntity()
-                            .getPath() + " " + entity.getHashCode());
+                            .getPath() + " " + entity.getHash());
             }
         };
 
-        return Blink.newConnection(socket, listener);
+        BlinkListener blinkListener = new BlinkListener() {
+            @Override
+            public void onBlinkDisconnect() {
+                Log.v(TAG, "BlinkConnection has been disconnected.");
+                Toast.makeText(MainActivity.this, "BlinkConnection has been disconnected.", Toast.LENGTH_SHORT).show();
+                // You should dispose blink
+            }
+        };
+
+        return Blink.newConnection(channel, receiveListener, blinkListener);
     }
 
     private void destroy() {
         if (mConn != null) {
-            mConn.destroy();
+            mConn.dispose();
             mConn = null;
-        }
-        if (mSocket != null) {
-            try {
-                mSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            mSocket = null;
         }
     }
 }
