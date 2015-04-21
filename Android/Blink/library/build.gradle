@@ -18,7 +18,21 @@ android {
     }
 }
 
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.0.0'
+task clear(type: Delete) {
+    delete '../../../Release/Android/blink.jar'
+    delete '../../../Release/Android/blink.aar'
 }
+
+task make(type: Copy) {
+    // Jar
+    from('build/intermediates/bundles/release/')
+    into('../../../Release/Android/')
+    include('classes.jar')
+    rename('classes.jar', 'blink.jar')
+    // aar
+    from('build/outputs/aar/')
+    into('../../../Release/Android/')
+    include('library-release.aar')
+    rename('library-release.aar', 'blink.aar')
+}
+make.dependsOn(clear, build)

@@ -85,7 +85,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        destroy();
+        dispose();
     }
 
 
@@ -102,7 +102,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             if (mConn == null) {
                 linkSocket(ip, port);
             } else {
-                destroy();
+                dispose();
                 refreshStatus();
             }
         } else if (id == R.id.btn_send) {
@@ -239,13 +239,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 Log.v(TAG, "BlinkConnection has been disconnected.");
                 Toast.makeText(MainActivity.this, "BlinkConnection has been disconnected.", Toast.LENGTH_SHORT).show();
                 // You should dispose blink
+                dispose();
+                refreshStatus();
             }
         };
 
         return Blink.newConnection(channel, receiveListener, blinkListener);
     }
 
-    private void destroy() {
+    private void dispose() {
         if (mConn != null) {
             mConn.dispose();
             mConn = null;
