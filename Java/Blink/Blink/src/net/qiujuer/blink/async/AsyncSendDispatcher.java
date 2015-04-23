@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
  * Created 04/16/2015
- * Changed 04/19/2015
+ * Changed 04/23/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,7 +41,7 @@ public class AsyncSendDispatcher extends AsyncEventArgs {
     // Used for telling us to die.
     private final AtomicBoolean mSending = new AtomicBoolean(false);
 
-    private SendPacket mSendPacket;
+    private SendPacket mPacket;
     private long mCursor;
     private long mTotal;
 
@@ -83,6 +83,133 @@ public class AsyncSendDispatcher extends AsyncEventArgs {
         }
     }
 
+    /**
+     * Notify send progress
+     */
+    private void notifyProgress() {
+        SendPacket packet = mPacket;
+        SendDelivery delivery = mDelivery;
+
+        if (!mDisposed.get() && packet != null && delivery != null) {
+            // Progress
+            float progress = (float) mCursor / mTotal;
+            // Post Callback
+            if (isNotifyProgress(progress)) {
+                delivery.postSendProgress(packet, mProgress);
+            }
+        }
+    }
+
+    /**
+     * Send next packet
+     */
+    private void sendNext() {
+        SendPacket packet = mPacket;
+        mPacket = null;
+        // Notify
+        if (packet != null) {
+
+            // Set Status
+            mStatus = mCursor == mTotal;
+
+            // End
+            packet.setSuccess(mStatus);
+            packet.endPacket();
+
+            // Post End
+            mCursor = mTotal;
+            notifyProgress();
+        }
+
+        // Check
+        mSending.set(!mQueue.isEmpty());
+        if (mSending.get()) {
+
+            // Pool a request from the queue.
+            packet = mQueue.poll();
+
+            // Cancel
+            if (packet.isCanceled()) {
+                sendNext();
+            } else {
+                // Set Packet
+                mPacket = packet;
+
+                // Start Send
+                sendHead();
+            }
+        }
+    }
+
+    /**
+     * Init send data head info
+     */
+    private void sendHead() {
+        // Init Head
+        final int size;
+        mTotal = mPacket.getLength();
+        if (mTotal <= 0)
+            size = 0;
+        else {
+            byte[] bytes = getBuffer();
+
+            // Type
+            bytes[0] = mPacket.getPacketType();
+
+            // Length
+            BitConverter.toBytes(mTotal, bytes, 1);
+
+            // Info
+            short infoLen = mPacket.readInfo(bytes, HeadSize);
+            BitConverter.toBytes(infoLen, bytes, HeadSize - 2);
+
+            size = HeadSize + infoLen;
+        }
+        // Check packet size
+        if (size > 0) {
+            // Init Size
+            mCursor = 0;
+            mProgress = 0;
+            // Post Start
+            notifyProgress();
+            // Init the packet
+            mPacket.startPacket();
+            // Send Head
+            sendAsync(0, size);
+        } else {
+            // Send next
+            mPacket = null;
+            sendNext();
+        }
+    }
+
+    /**
+     * Start packet entity
+     */
+    private void sendEntity() {
+        SendPacket packet = mPacket;
+        if (packet != null) {
+            // Buffer
+            byte[] bytes = getBuffer();
+
+            int count = packet.read(bytes, 0, mSender.getSendBufferSize());
+
+            mCursor += count;
+
+            // Send
+            sendAsync(0, count);
+
+            // Notify
+            notifyProgress();
+        }
+    }
+
+    /**
+     * Start asynchronous send buffer
+     *
+     * @param offset buffer offset
+     * @param count  send size
+     */
     private void sendAsync(int offset, int count) {
         if (mDisposed.get())
             return;
@@ -100,109 +227,11 @@ public class AsyncSendDispatcher extends AsyncEventArgs {
         }
     }
 
-    private void sendNext() {
-        // Set Status
-        mStatus = mCursor == mTotal;
-
-        SendPacket packet = mSendPacket;
-        mSendPacket = null;
-        // Notify
-        if (packet != null) {
-
-            // End
-            packet.setSuccess(mStatus);
-            packet.endPacket();
-
-            // Post End
-            SendDelivery delivery = mDelivery;
-            if (delivery != null && mProgress != 1) {
-                delivery.postSendProgress(packet, 1);
-            }
-        }
-
-        // Init Size
-        mCursor = 0;
-        mTotal = 0;
-        mProgress = 0;
-
-        // Check
-        mSending.set(!mQueue.isEmpty());
-
-        if (mSending.get()) {
-
-            // Pool a request from the queue.
-            packet = mQueue.poll();
-
-            // Cancel
-            if (packet.isCanceled()) {
-                sendNext();
-            }
-
-            // Set Packet
-            mSendPacket = packet;
-
-            // Post Start
-            SendDelivery delivery = mDelivery;
-            if (delivery != null)
-                delivery.postSendProgress(packet, 0);
-
-            // Init the packet
-            packet.startPacket();
-
-            // Send
-            mStatus = sendHead(packet);
-
-        }
-    }
-
-    private boolean sendHead(SendPacket entity) {
-        mTotal = entity.getLength();
-        if (mTotal <= 0)
-            return false;
-
-        byte[] bytes = getBuffer();
-
-        // Type
-        bytes[0] = entity.getPacketType();
-
-        // Length
-        BitConverter.toBytes(mTotal, bytes, 1);
-
-        // Info
-        short infoLen = entity.readInfo(bytes, HeadSize);
-        BitConverter.toBytes(infoLen, bytes, HeadSize - 2);
-
-        // Send
-        sendAsync(0, HeadSize + infoLen);
-
-        return true;
-    }
-
-    private void sendEntity() {
-        SendPacket packet = mSendPacket;
-        if (packet != null) {
-            // Buffer
-            byte[] bytes = getBuffer();
-
-            int count = packet.read(bytes, 0, mSender.getSendBufferSize());
-
-            mCursor += count;
-
-            // Send
-            sendAsync(0, count);
-
-            SendDelivery delivery = mDelivery;
-            if (delivery != null) {
-                // Progress
-                float progress = (float) mCursor / mTotal;
-                // Post Callback
-                if (isNotifyProgress(progress)) {
-                    delivery.postSendProgress(packet, mProgress);
-                }
-            }
-        }
-    }
-
+    /**
+     * On asynchronous send end callback
+     *
+     * @param e AsyncEventArgs
+     */
     @Override
     protected void onCompleted(AsyncEventArgs e) {
         super.onCompleted(e);
@@ -225,8 +254,8 @@ public class AsyncSendDispatcher extends AsyncEventArgs {
 
             super.dispose();
 
-            SendPacket packet = mSendPacket;
-            mSendPacket = null;
+            SendPacket packet = mPacket;
+            mPacket = null;
 
             SendDelivery delivery = mDelivery;
             mDelivery = null;

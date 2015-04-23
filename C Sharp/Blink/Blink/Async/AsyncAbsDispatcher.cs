@@ -15,8 +15,6 @@ namespace Net.Qiujuer.Blink.Async
         protected bool mStatus = true;
 
 
-
-
         public AsyncAbsDispatcher(float progressPrecision)
         {
             mProgressPrecision = progressPrecision;
@@ -25,7 +23,9 @@ namespace Net.Qiujuer.Blink.Async
 
         protected bool IsNotifyProgress(float newProgress)
         {
-            if ((newProgress - mProgress) > mProgressPrecision)
+            if (newProgress == 0 ||
+                newProgress == 1 ||
+                (newProgress - mProgress) > mProgressPrecision)
             {
                 mProgress = newProgress;
                 return true;

@@ -30,7 +30,7 @@ namespace Net.Qiujuer.Blink.Async
         /// </summary>
         private volatile bool mSending = false;
 
-        private SendPacket mSendPacket;
+        private SendPacket mPacket;
         private long mCursor;
         private long mTotal;
 
@@ -46,71 +46,77 @@ namespace Net.Qiujuer.Blink.Async
             SetBuffer(new byte[sender.GetBufferSize()], 0, sender.GetBufferSize());
         }
 
+        /// <summary>
+        /// Add a packet to queue to send
+        /// </summary>
+        /// <param name="packet">SendPacket</param>
         public void Send(SendPacket packet)
         {
             mQueue.Enqueue(packet);
 
-            if (!mSending)
+            lock (this)
             {
-                mSending = true;
+                if (!mSending)
+                {
+                    mSending = true;
 
-                // Send Next
-                SendNext();
+                    // Send Next
+                    SendNext();
+                }
             }
         }
 
+        /// <summary>
+        /// Delete a packet from queue to cancel
+        /// </summary>
+        /// <param name="packet">SendPacket</param>
         public void Cancel(SendPacket packet)
         {
             // Wait.....
         }
 
-        private void SendAsync(int offset, int count)
+        /// <summary>
+        /// Notify send progress
+        /// </summary>
+        private void NotifyProgress()
         {
-            if (mDisposed)
-                return;
+            SendPacket packet = mPacket;
+            SendDelivery delivery = mDelivery;
 
-            if (count <= 0)
-                SendNext();
-
-            // Set Send Buffer Size
-            SetBuffer(offset, count);
-
-            // As soon as the client is connected, post a receive to the connection
-            mStatus = mSender.SendAsync(this);
-            if (!mStatus)
+            if (packet != null && delivery != null)
             {
-                OnCompleted(this);
+                // Progress
+                float progress = (float)mCursor / mTotal;
+                // Post Callback
+                if (IsNotifyProgress(progress))
+                {
+                    delivery.PostSendProgress(packet, mProgress);
+                }
             }
         }
 
+        /// <summary>
+        /// Send next packet
+        /// </summary>
         private void SendNext()
         {
-            // Set Status
-            mStatus = mCursor == mTotal;
-
-
-            SendPacket packet = mSendPacket;
-            // Set Null
-            mSendPacket = null;
-            // Notity
+            SendPacket packet = mPacket;
+            mPacket = null;
+            // Notify
             if (packet != null)
             {
+
+                // Set Status
+                mStatus = mCursor == mTotal;
+
                 // End
                 packet.SetSuccess(mStatus);
                 packet.EndPacket();
 
                 // Post End
-                SendDelivery delivery = mDelivery;
-                if (delivery != null && mProgress != 1)
-                {
-                    delivery.PostSendProgress(packet, 1);
-                }
+                mCursor = mTotal;
+                NotifyProgress();
             }
-
-            // Init Size
-            mCursor = 0;
-            mTotal = 0;
-            mProgress = 0;
 
             // Take a request from the queue.
             mSending = mQueue.TryDequeue(out packet);
@@ -122,50 +128,74 @@ namespace Net.Qiujuer.Blink.Async
                 {
                     SendNext();
                 }
+                else
+                {
+                    // Set Packet
+                    mPacket = packet;
 
-                // Set Packet
-                mSendPacket = packet;
-
-                // Post Start
-                SendDelivery delivery = mDelivery;
-                if (delivery != null)
-                    delivery.PostSendProgress(packet, 0);
-
-                // Init the packet
-                packet.StartPacket();
-
-                // Send
-                mStatus = SendHead(packet);
-
+                    // Start Send
+                    SendHead();
+                }
             }
         }
 
-        private bool SendHead(SendPacket entity)
+        /// <summary>
+        /// Init send data head info
+        /// </summary>
+        private void SendHead()
         {
-            mTotal = entity.GetLength();
+            // Init Head
+            int size;
+            mTotal = mPacket.GetLength();
             if (mTotal <= 0)
-                return false;
+                size = 0;
+            else
+            {
+                // Type
+                Buffer[0] = mPacket.GetPacketType();
 
-            // Type
-            Buffer[0] = entity.GetPacketType();
+                // Length
+                byte[] lenBytes = BitConverter.GetBytes(mTotal);
+                lenBytes.CopyTo(Buffer, 1);
 
-            // Length
-            byte[] lenBytes = BitConverter.GetBytes(mTotal);
-            lenBytes.CopyTo(Buffer, 1);
+                // Info
+                short infoLen = mPacket.ReadInfo(Buffer, HeadSize);
+                byte[] infoLenBytes = BitConverter.GetBytes(infoLen);
+                infoLenBytes.CopyTo(Buffer, HeadSize - 2);
 
-            // Info
-            short infoLen = entity.ReadInfo(Buffer, HeadSize);
-            byte[] infoLenBytes = BitConverter.GetBytes(infoLen);
-            infoLenBytes.CopyTo(Buffer, HeadSize - 2);
+                size = HeadSize + infoLen;
+            }
+            // Check packet size
+            if (size > 0)
+            {
+                // Init Size
+                mCursor = 0;
+                mProgress = 0;
 
-            SendAsync(0, HeadSize + infoLen);
+                // Post Start
+                NotifyProgress();
 
-            return true;
+                // Init the packet
+                mPacket.StartPacket();
+
+                // Send Head
+                SendAsync(0, size);
+            }
+            else
+            {
+
+                // Send next
+                mPacket = null;
+                SendNext();
+            }
         }
 
+        /// <summary>
+        /// Start packet entity
+        /// </summary>
         private void SendEntity()
         {
-            SendPacket packet = mSendPacket;
+            SendPacket packet = mPacket;
             if (packet != null)
             {
                 int count = packet.Read(Buffer, 0, mSender.GetBufferSize());
@@ -189,6 +219,34 @@ namespace Net.Qiujuer.Blink.Async
 
         }
 
+        /// <summary>
+        /// Start asynchronous send buffer
+        /// </summary>
+        /// <param name="offset">buffer offset</param>
+        /// <param name="count">send size</param>
+        private void SendAsync(int offset, int count)
+        {
+            if (mDisposed)
+                return;
+
+            if (count <= 0)
+                SendNext();
+
+            // Set Send Buffer Size
+            SetBuffer(offset, count);
+
+            // As soon as the client is connected, post a receive to the connection
+            mStatus = mSender.SendAsync(this);
+            if (!mStatus)
+            {
+                OnCompleted(this);
+            }
+        }
+
+        /// <summary>
+        /// On asynchronous send end callback
+        /// </summary>
+        /// <param name="e">SocketAsyncEventArgs</param>
         protected override void OnCompleted(SocketAsyncEventArgs e)
         {
             base.OnCompleted(e);
@@ -215,8 +273,8 @@ namespace Net.Qiujuer.Blink.Async
         {
             if (!IsDisposed())
             {
-                SendPacket packet = mSendPacket;
-                mSendPacket = null;
+                SendPacket packet = mPacket;
+                mPacket = null;
 
                 SendDelivery delivery = mDelivery;
                 mDelivery = null;
