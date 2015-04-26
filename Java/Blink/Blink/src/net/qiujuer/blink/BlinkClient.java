@@ -19,6 +19,8 @@
  */
 package net.qiujuer.blink;
 
+import net.qiujuer.blink.core.ExecutorDelivery;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -31,6 +33,10 @@ import java.nio.channels.SocketChannel;
  */
 public class BlinkClient extends BlinkConnect {
     private SocketAddress mAddress;
+
+    public BlinkClient() {
+        setDelivery(new ExecutorDelivery(null));
+    }
 
     public boolean connect(String ip, int port) {
         return connect(new InetSocketAddress(ip, port));
@@ -59,6 +65,9 @@ public class BlinkClient extends BlinkConnect {
     public boolean reconnect() {
         if (mAddress == null)
             throw new NullPointerException("SocketChannel address is null, you should call connect.");
+
+        dispose();
+
         return connect(mAddress);
     }
 }

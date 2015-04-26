@@ -56,14 +56,11 @@ public class FileSendPacket extends BaseSendPacket<File> {
     }
 
     @Override
-    public short readInfo(byte[] buffer, int index) {
+    public byte[] getInfo() {
         try {
-            byte[] info = mEntity.getName().getBytes("UTF-8");
-            short len = (short) info.length;
-            System.arraycopy(info, 0, buffer, index, len);
-            return len;
+            return mEntity.getName().getBytes("UTF-8");
         } catch (Exception e) {
-            return 0;
+            return null;
         }
     }
 }

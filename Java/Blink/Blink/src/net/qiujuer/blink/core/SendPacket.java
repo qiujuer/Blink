@@ -87,12 +87,10 @@ public abstract class SendPacket extends Packet {
      * On Sender send the packet call this to send packet info
      * The bytes in 0~32767 size
      *
-     * @param buffer Send buffer
-     * @param index  Buffer start index
      * @return Read to buffer count
      */
-    public short readInfo(byte[] buffer, int index) {
-        return 0;
+    public byte[] getInfo() {
+        return null;
     }
 
     /**

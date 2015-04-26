@@ -25,9 +25,8 @@ import net.qiujuer.blink.async.IoEventArgs;
  * SendPacket formatter
  * Format packet to IoEventArgs {@link IoEventArgs}
  */
-public abstract class PacketFormatter {
+public abstract class PacketFormatter extends PacketFilter {
     protected SendPacket mPacket;
-    protected IoEventArgs mArgs;
 
     public abstract float format();
 
@@ -35,7 +34,4 @@ public abstract class PacketFormatter {
         mPacket = packet;
     }
 
-    public void setEventArgs(IoEventArgs args) {
-        mArgs = args;
-    }
 }

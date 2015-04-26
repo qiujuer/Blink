@@ -25,9 +25,8 @@ import net.qiujuer.blink.async.IoEventArgs;
  * ReceivePacket PacketParser
  * Parser IoEventArgs {@link IoEventArgs} to packet
  */
-public abstract class PacketParser {
+public abstract class PacketParser extends PacketFilter {
     protected ReceivePacket mPacket;
-    protected IoEventArgs mArgs;
 
     public abstract float parse();
 
@@ -35,7 +34,4 @@ public abstract class PacketParser {
         return mPacket;
     }
 
-    public void setEventArgs(IoEventArgs args) {
-        mArgs = args;
-    }
 }

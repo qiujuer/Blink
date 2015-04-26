@@ -57,11 +57,9 @@ public abstract class ReceivePacket extends Packet {
     /**
      * On Receiver receive same info buffer call this
      *
-     * @param buffer Info data
-     * @param offset Buffer offset
-     * @param count  Buffer Count
+     * @param bytes Info data
      */
-    public void writeInfo(byte[] buffer, int offset, int count) {
+    public void setInfo(byte[] bytes) {
     }
 
     /**

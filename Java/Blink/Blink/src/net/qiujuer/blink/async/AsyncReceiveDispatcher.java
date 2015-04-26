@@ -21,6 +21,7 @@ package net.qiujuer.blink.async;
 
 import net.qiujuer.blink.BlinkClient;
 import net.qiujuer.blink.core.Connector;
+import net.qiujuer.blink.core.PacketFilter;
 import net.qiujuer.blink.core.PacketParser;
 import net.qiujuer.blink.core.ReceiveDispatcher;
 import net.qiujuer.blink.core.ReceivePacket;
@@ -74,9 +75,9 @@ public class AsyncReceiveDispatcher extends AsyncDispatcher implements ReceiveDi
         // Notify
         ReceiveDelivery delivery = mReceiveDelivery;
         if (delivery != null && isNotifyProgress(progress)) {
-            if (progress == 0) {
+            if (progress == PacketFilter.STATUS_START) {
                 delivery.postReceiveStart(mConnector, mParser.getPacket());
-            } else if (progress == 1) {
+            } else if (progress == PacketFilter.STATUS_END) {
                 delivery.postReceiveCompleted(mConnector, mParser.getPacket());
             } else {
                 delivery.postReceiveProgress(mConnector, mParser.getPacket(), progress);

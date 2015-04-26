@@ -27,65 +27,83 @@ import net.qiujuer.blink.kit.convert.BitConverter;
  * Async send packet formatter
  */
 public class AsyncFormatter extends PacketFormatter {
-    // Send an Receive packet head size
-    public final static int HEAD_SIZE = 11;
-    public final static int NEED_PACKET = -1;
-
-    private long mCursor = 0;
-    private long mTotal = 0;
+    protected byte[] mInfoBytes;
+    protected short mSurInfoLen;
+    protected long mSurEntityLen = 0;
+    protected float mTotal = 0;
 
     @Override
     public float format() {
-        if (mPacket == null)
-            return NEED_PACKET;
+        SendPacket packet = mPacket;
 
-        if (mTotal == 0) {
-            return formatHead(mArgs.getBuffer());
-        } else if (mCursor != mTotal) {
-            formatEntity(mArgs.getBuffer());
-        }
-        return mCursor / (float) mTotal;
+        if (packet == null)
+            return STATUS_NEED;
+        else if (mSurInfoLen > 0)
+            return formatInfo(mArgs.getBuffer());
+        else if (mSurEntityLen > 0)
+            return formatEntity(packet, mArgs.getBuffer());
+        else
+            return formatHead(packet, mArgs.getBuffer());
+
     }
 
     @Override
     public void setPacket(SendPacket packet) {
         super.setPacket(packet);
         mTotal = 0;
-        mCursor = 0;
+        mSurEntityLen = 0;
+        mSurInfoLen = 0;
     }
 
-    protected float formatHead(byte[] buffer) {
-        mTotal = mPacket.getLength();
-        if (mTotal <= 0) {
-            return NEED_PACKET;
+    protected float formatHead(SendPacket packet, byte[] buffer) {
+        mSurEntityLen = packet.getLength();
+        if (mSurEntityLen <= 0) {
+            return STATUS_NEED;
         } else {
             // Type
-            buffer[0] = mPacket.getPacketType();
+            buffer[0] = packet.getPacketType();
             // Length
-            BitConverter.toBytes(mTotal, buffer, 1);
+            BitConverter.toBytes(mSurEntityLen, buffer, 1);
             // Info
-            short infoLen = mPacket.readInfo(buffer, HEAD_SIZE);
-            BitConverter.toBytes(infoLen, buffer, HEAD_SIZE - 2);
-            // Send head
-            int headCount = HEAD_SIZE + infoLen;
+            mInfoBytes = packet.getInfo();
+            if (mInfoBytes != null)
+                mSurInfoLen = (short) mInfoBytes.length;
+            BitConverter.toBytes(mSurInfoLen, buffer, HEAD_SIZE - 2);
+            // Total
+            mTotal = mSurInfoLen + mSurEntityLen;
             // Set buffer
-            setArgBuffer(headCount);
+            setArgBuffer(HEAD_SIZE);
             // Start
-            mPacket.startPacket();
-            return 0;
+            packet.startPacket();
+            return STATUS_START;
         }
     }
 
-    protected void formatEntity(byte[] buffer) {
-        int count = mPacket.read(buffer, 0, buffer.length);
+    protected float formatInfo(byte[] buffer) {
+        int count = Math.min(mSurInfoLen, buffer.length);
+        System.arraycopy(mInfoBytes, mInfoBytes.length - mSurInfoLen, buffer, 0, count);
+        mSurInfoLen -= count;
+        if (mSurInfoLen <= 0)
+            mInfoBytes = null;
+        setArgBuffer(count);
+
+        return ((mTotal - mSurInfoLen - mSurEntityLen) / mTotal);
+    }
+
+    protected float formatEntity(SendPacket packet, byte[] buffer) {
+        int count = packet.read(buffer, 0, buffer.length);
         if (count > 0) {
             setArgBuffer(count);
-            mCursor += count;
+            mSurEntityLen -= count;
         }
 
         // End
-        if (mCursor >= mTotal)
-            mPacket.endPacket();
+        if (mSurEntityLen <= 0) {
+            packet.endPacket();
+            return STATUS_END;
+        } else {
+            return ((mTotal - mSurInfoLen - mSurEntityLen) / mTotal);
+        }
     }
 
     protected void setArgBuffer(int count) {

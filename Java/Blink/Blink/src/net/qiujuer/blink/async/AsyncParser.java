@@ -34,8 +34,6 @@ import java.io.IOException;
  * Asynchronous packet parser
  */
 public class AsyncParser extends PacketParser {
-    // Send an Receive packet head size
-    public final static int HEAD_SIZE = 11;
     // A unique identifier on the Resource clear
     private final String mMark;
     // The root directory to use for the resource.
@@ -44,36 +42,38 @@ public class AsyncParser extends PacketParser {
     private int mBufferSize;
     // Receive packet id
     private long mId = 0;
-    // Size
-    private short mSurInfoLen;
-    private long mSurEntityLen;
-    private float mTotal;
 
-    public AsyncParser(String mark, File path, int bufferSize) {
+    protected byte[] mInfoBytes;
+    // Size
+    protected short mSurInfoLen;
+    protected long mSurEntityLen;
+    protected float mTotal;
+
+
+    public AsyncParser(String mark, File path) {
         mMark = mark;
         mPath = path;
-        mBufferSize = bufferSize;
     }
 
     @Override
     public float parse() {
-        float progress = 0;
-        // Receive Entity
-        if (mSurInfoLen > 0)
-            progress = parseInfo(mArgs.getBuffer(), mArgs.getOffset(), mArgs.getBytesTransferred());
-        else if (mSurEntityLen > 0)
-            progress = parseEntity(mArgs.getBuffer(), mArgs.getOffset(), mArgs.getBytesTransferred());
-        else {
-            // Receive Head
-            progress = parseHead(mArgs.getBuffer());
-        }
 
-        return progress;
+        if (mSurInfoLen > 0) {
+            // Receive Entity
+            return parseInfo(mArgs.getBuffer(), 0, mArgs.getOffset() + mArgs.getBytesTransferred());
+        } else if (mSurEntityLen > 0) {
+            // Receive Info
+            return parseEntity(mArgs.getBuffer(), 0, mArgs.getOffset() + mArgs.getBytesTransferred());
+        } else {
+            // Receive Head
+            return parseHead(mArgs.getBuffer());
+        }
     }
 
     @Override
     public void setEventArgs(IoEventArgs args) {
         super.setEventArgs(args);
+        mBufferSize = args.getBuffer().length;
         setArgBuffer(HEAD_SIZE);
     }
 
@@ -86,6 +86,9 @@ public class AsyncParser extends PacketParser {
             mSurEntityLen = len;
             mSurInfoLen = BitConverter.toShort(buffer, HEAD_SIZE - 2);
             mTotal = mSurInfoLen + mSurEntityLen;
+
+            if (mSurInfoLen > 0)
+                mInfoBytes = new byte[mSurInfoLen];
 
             // Parse receive packet
             ReceivePacket packet = parseType(type, len);
@@ -100,24 +103,27 @@ public class AsyncParser extends PacketParser {
 
         setArgBuffer(mSurInfoLen > 0 ? mSurInfoLen : mSurEntityLen);
 
-        return 0;
+        return STATUS_START;
     }
 
     protected float parseInfo(byte[] buffer, int offset, int count) {
+        // Copy
+        System.arraycopy(buffer, offset, mInfoBytes, mInfoBytes.length - mSurInfoLen, count);
         // Set len
         mSurInfoLen -= count;
-
         if (mSurInfoLen <= 0) {
             // Set Info
             ReceivePacket packet = mPacket;
             if (packet != null) {
-                packet.writeInfo(buffer, offset, offset + count);
+                packet.setInfo(mInfoBytes);
             }
-
+            mInfoBytes = null;
+            // Receive entity
+            setArgBuffer(mSurEntityLen);
+        } else {
+            // Receive entity
+            setArgBuffer(mSurInfoLen);
         }
-        // Receive entity
-        setArgBuffer(mSurInfoLen > 0 ? mSurInfoLen : mSurEntityLen);
-
         return (mTotal - mSurInfoLen - mSurEntityLen) / mTotal;
     }
 
@@ -128,17 +134,19 @@ public class AsyncParser extends PacketParser {
         ReceivePacket packet = mPacket;
         if (packet != null) {
             packet.write(buffer, offset, count);
-
-            if (mSurEntityLen <= 0) {
-                // End
-                packet.endPacket();
-            }
         }
 
         // Receive next entity
         setArgBuffer(mSurEntityLen);
 
-        return (mTotal - mSurInfoLen - mSurEntityLen) / mTotal;
+        // Progress
+        if (mSurEntityLen <= 0) {
+            if (packet != null) {
+                packet.endPacket();
+            }
+            return STATUS_END;
+        } else
+            return (mTotal - mSurInfoLen - mSurEntityLen) / mTotal;
     }
 
     protected void setArgBuffer(long size) {

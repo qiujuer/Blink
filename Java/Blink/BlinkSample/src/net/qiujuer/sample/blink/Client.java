@@ -24,7 +24,7 @@ public class Client {
         connect.send(new byte[]{1, 1, 1, 0, 1});
 
         System.out.println("Send A File.(D:/Data.txt)");
-        connect.send(new File("F:\\TDDOWNLOAD\\Game\\DevilMayCry4.7z"),
+        connect.send(new File("F:\\TDDOWNLOAD\\Game\\LIMBO.zip"),
                 new SendListener() {
                     @Override
                     public void onSendStart(SendPacket packet) {

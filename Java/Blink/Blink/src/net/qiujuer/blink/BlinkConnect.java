@@ -9,12 +9,13 @@ import net.qiujuer.blink.box.ByteSendPacket;
 import net.qiujuer.blink.box.FileSendPacket;
 import net.qiujuer.blink.box.StringSendPacket;
 import net.qiujuer.blink.core.Connector;
+import net.qiujuer.blink.core.ExecutorDelivery;
 import net.qiujuer.blink.core.listener.SendListener;
-import net.qiujuer.blink.kit.ExecutorDelivery;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.Executor;
 
 /**
  * This is Box Packet send connector
@@ -24,9 +25,24 @@ public abstract class BlinkConnect extends Connector {
     // Default on-disk resource directory.
     private static final String DEFAULT_RESOURCE_DIR = "Blink";
     // Cache path with create file to box
-    private File mCachePath = new File("C:/Blink/");
+    private File mCachePath = new File("D:/Blink/");
     // SocketChannel use to sender and receiver
     private SocketChannel mChannel;
+
+    public void setDelivery(Executor delivery) {
+        setDelivery(new ExecutorDelivery(delivery));
+    }
+
+    /**
+     * Set listener notify delivery
+     *
+     * @param delivery ExecutorDelivery
+     */
+    public void setDelivery(ExecutorDelivery delivery) {
+        setConnectDelivery(delivery);
+        setReceiveDelivery(delivery);
+        setSendDelivery(delivery);
+    }
 
 
     /**
@@ -35,18 +51,14 @@ public abstract class BlinkConnect extends Connector {
     protected void start(SocketChannel channel) throws IOException {
         mChannel = channel;
 
-        ExecutorDelivery delivery = new ExecutorDelivery(null);
-
-        setConnectDelivery(delivery);
-        setReceiveDelivery(delivery);
-        setSendDelivery(delivery);
+        if (mPacketFormatter == null)
+            setPacketFormatter(new AsyncFormatter());
+        if (mPacketParser == null)
+            setPacketParser(new AsyncParser(getId(), getCachePath()));
 
         AsyncSocketAdapter socketAdapter = new AsyncSocketAdapter(mChannel, this, mConnectDelivery);
         setSender(socketAdapter);
         setReceiver(socketAdapter);
-
-        setPacketFormatter(new AsyncFormatter());
-        setPacketParser(new AsyncParser(getId(), getCachePath(), getBufferSize()));
 
         setSendDispatcher(new AsyncSendDispatcher(mSender, mSendDelivery, mPacketFormatter, getProgressPrecision()));
         setReceiveDispatcher(new AsyncReceiveDispatcher(mReceiver, mPacketParser, this, mReceiveDelivery));

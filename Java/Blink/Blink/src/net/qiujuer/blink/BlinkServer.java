@@ -1,5 +1,8 @@
 package net.qiujuer.blink;
 
+import net.qiujuer.blink.core.Connector;
+import net.qiujuer.blink.core.ExecutorDelivery;
+import net.qiujuer.blink.core.listener.ConnectListener;
 import net.qiujuer.blink.kit.Disposable;
 
 import java.io.IOException;
@@ -21,11 +24,14 @@ public class BlinkServer extends Thread implements Disposable {
     private boolean mRun = true;
     private ServerSocketChannel mServer;
     private Selector mSelector;
-    private ExecutorService mExecutor = Executors.newSingleThreadExecutor();
+    private ExecutorService mExecutor;
     private ServerListener mServerListener;
+    private ExecutorDelivery mDelivery;
 
     public BlinkServer(ServerListener listener) {
         mServerListener = listener;
+        mExecutor = Executors.newSingleThreadExecutor();
+        mDelivery = new ExecutorDelivery(mExecutor);
     }
 
     public void bind(int port) throws IOException {
@@ -37,6 +43,14 @@ public class BlinkServer extends Thread implements Disposable {
 
         setName("BlinkServer-Selector-Thread");
         start();
+    }
+
+    public ServerSocketChannel getServerSocketChannel() {
+        return mServer;
+    }
+
+    public List<BlinkConnect> getConnectors() {
+        return mConnectors;
     }
 
     @Override
@@ -54,12 +68,17 @@ public class BlinkServer extends Thread implements Disposable {
 
                         SocketChannel channel = server.accept();
                         ServerConnect connect = new ServerConnect();
+
+                        // Listener
+                        onConnectCreated(connect);
+
+                        connect.setGlobeDelivery(mDelivery);
                         connect.start(channel);
 
                         synchronized (mConnectors) {
                             mConnectors.add(connect);
                         }
-                        onConnectCreated(connect);
+
                     }
                 }
             } catch (Exception e) {
@@ -95,16 +114,17 @@ public class BlinkServer extends Thread implements Disposable {
         }
     }
 
-    private void onConnectCreated(BlinkConnect connect) {
+    private void onConnectCreated(ServerConnect connect) {
         ServerListener listener = mServerListener;
         if (listener != null)
             listener.onConnectCreated(connect);
     }
 
-    private void onConnectClosed(BlinkConnect connect) {
+    private void onConnectClosed(ServerConnect connect) {
         synchronized (mConnectors) {
             mConnectors.remove(connect);
         }
+        connect.setGlobeDelivery(null);
         ServerListener listener = mServerListener;
         if (listener != null)
             listener.onConnectClosed(connect);
@@ -112,15 +132,25 @@ public class BlinkServer extends Thread implements Disposable {
 
     class ServerConnect extends BlinkConnect {
         @Override
-        public void deliveryConnectClosed() {
+        protected void deliveryConnectClosed() {
             onConnectClosed(this);
             super.deliveryConnectClosed();
         }
+
+        void setGlobeDelivery(ExecutorDelivery delivery) {
+            if (mConnectDelivery != null) {
+                if (delivery == null && mConnectDelivery == mDelivery) {
+                    mConnectDelivery = null;
+                    mReceiveDelivery = null;
+                    mSendDelivery = null;
+                }
+                return;
+            }
+            setDelivery(delivery);
+        }
     }
 
-    public interface ServerListener {
-        void onConnectCreated(BlinkConnect connect);
-
-        void onConnectClosed(BlinkConnect connect);
+    public interface ServerListener extends ConnectListener {
+        void onConnectCreated(Connector connector);
     }
 }

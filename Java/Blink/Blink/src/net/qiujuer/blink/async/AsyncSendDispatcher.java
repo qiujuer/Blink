@@ -20,6 +20,7 @@
 package net.qiujuer.blink.async;
 
 import net.qiujuer.blink.BlinkClient;
+import net.qiujuer.blink.core.PacketFilter;
 import net.qiujuer.blink.core.PacketFormatter;
 import net.qiujuer.blink.core.SendDispatcher;
 import net.qiujuer.blink.core.SendPacket;
@@ -106,9 +107,9 @@ public class AsyncSendDispatcher extends AsyncDispatcher implements SendDispatch
                 && delivery != null
                 && packet != null
                 && isNotifyProgress(progress)) {
-            if (progress == 0)
+            if (progress == PacketFilter.STATUS_START)
                 delivery.postSendStart(packet);
-            else if (progress == 1)
+            else if (progress == PacketFilter.STATUS_END)
                 delivery.postSendCompleted(packet);
             else
                 delivery.postSendProgress(packet, progress);
@@ -121,7 +122,7 @@ public class AsyncSendDispatcher extends AsyncDispatcher implements SendDispatch
      */
     private void sendPacket() {
         float progress = mFormatter.format();
-        if (progress < 0) {
+        if (progress == PacketFilter.STATUS_NEED) {
             SendPacket packet = takePacket();
             mFormatter.setPacket(packet);
             if (packet != null) {
@@ -131,7 +132,7 @@ public class AsyncSendDispatcher extends AsyncDispatcher implements SendDispatch
             notifyProgress(progress);
 
             // Next
-            if (progress == 1)
+            if (progress == PacketFilter.STATUS_END)
                 mFormatter.setPacket(takePacket());
 
             sendAsync();

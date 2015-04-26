@@ -1,7 +1,7 @@
 package net.qiujuer.sample.blink;
 
-import net.qiujuer.blink.BlinkConnect;
 import net.qiujuer.blink.BlinkServer;
+import net.qiujuer.blink.core.Connector;
 
 import java.io.IOException;
 
@@ -14,15 +14,14 @@ public class Server extends Thread {
 
         BlinkServer accept = new BlinkServer(new BlinkServer.ServerListener() {
             @Override
-            public void onConnectCreated(BlinkConnect connect) {
-                connect.setReceiveListener(callBack);
-                connect.setConnectListener(callBack);
-                System.out.println("onConnectCreated:" + connect.getId());
+            public void onConnectClosed(Connector connector) {
+                System.out.println("onConnectClosed:" + connector.getId());
             }
 
             @Override
-            public void onConnectClosed(BlinkConnect connect) {
-                System.out.println("onConnectClosed:" + connect.getId());
+            public void onConnectCreated(Connector connector) {
+                connector.setReceiveListener(callBack);
+                System.out.println("onConnectCreated:" + connector.getId());
             }
         });
         accept.bind(2626);

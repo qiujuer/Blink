@@ -19,6 +19,7 @@
  */
 package net.qiujuer.blink.async;
 
+import net.qiujuer.blink.core.PacketFilter;
 import net.qiujuer.blink.kit.Disposable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,9 +39,13 @@ public abstract class AsyncDispatcher extends IoEventArgs implements Disposable 
     }
 
     protected boolean isNotifyProgress(float newProgress) {
-        if (newProgress == 0
-                || newProgress == 1
-                || ((newProgress - mProgress) > mProgressPrecision)) {
+        if (newProgress == PacketFilter.STATUS_START) {
+            mProgress = 0;
+            return true;
+        } else if (newProgress == PacketFilter.STATUS_END) {
+            mProgress = 1;
+            return true;
+        } else if ((newProgress - mProgress) > mProgressPrecision) {
             mProgress = newProgress;
             return true;
         } else {

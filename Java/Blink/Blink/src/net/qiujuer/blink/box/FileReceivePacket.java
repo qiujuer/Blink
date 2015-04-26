@@ -97,9 +97,9 @@ public class FileReceivePacket extends BaseReceivePacket<File> {
     }
 
     @Override
-    public void writeInfo(byte[] buffer, int offset, int count) {
+    public void setInfo(byte[] bytes) {
         try {
-            mFileName = new String(buffer, offset, count, "UTF-8");
+            mFileName = new String(bytes, "UTF-8");
         } catch (Exception e) {
             mFileName = null;
         }

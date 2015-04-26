@@ -17,11 +17,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.qiujuer.blink.kit;
+package net.qiujuer.blink.core;
 
-import net.qiujuer.blink.core.Connector;
-import net.qiujuer.blink.core.ReceivePacket;
-import net.qiujuer.blink.core.SendPacket;
 import net.qiujuer.blink.core.delivery.ConnectDelivery;
 import net.qiujuer.blink.core.delivery.ReceiveDelivery;
 import net.qiujuer.blink.core.delivery.SendDelivery;
@@ -81,7 +78,6 @@ public class ExecutorDelivery implements ConnectDelivery, SendDelivery, ReceiveD
     public void postReceiveCompleted(Connector connector, ReceivePacket packet) {
         mPoster.execute(new ReceiveCompletedDeliveryRunnable(connector, packet));
     }
-
 
     private class ConnectDeliveryRunnable implements Runnable {
         Connector connector;

@@ -192,7 +192,7 @@ public class SelectorFactory implements Disposable {
 
                         Set<SelectionKey> keys = mReadSelector.selectedKeys();
                         for (SelectionKey key : keys) {
-                            if (key.isReadable()) {
+                            if (key.isValid() && key.isReadable()) {
                                 handleRead(key);
                             }
                         }
@@ -223,7 +223,7 @@ public class SelectorFactory implements Disposable {
 
                         Set<SelectionKey> keys = mWriteSelector.selectedKeys();
                         for (SelectionKey key : keys) {
-                            if (key.isWritable()) {
+                            if (key.isValid() && key.isWritable()) {
                                 handleWrite(key);
                             }
                         }
