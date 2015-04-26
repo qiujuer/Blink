@@ -22,7 +22,7 @@ package net.qiujuer.blink.core;
 import net.qiujuer.blink.box.ByteSendPacket;
 import net.qiujuer.blink.box.FileSendPacket;
 import net.qiujuer.blink.box.StringSendPacket;
-import net.qiujuer.blink.listener.SendListener;
+import net.qiujuer.blink.core.listener.SendListener;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

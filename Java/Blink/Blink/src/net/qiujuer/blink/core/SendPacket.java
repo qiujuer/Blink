@@ -19,15 +19,15 @@
  */
 package net.qiujuer.blink.core;
 
-import net.qiujuer.blink.listener.SendListener;
+import net.qiujuer.blink.core.listener.SendListener;
 
 /**
  * Blink SendPacket
  */
-public abstract class SendPacket extends BlinkPacket {
+public abstract class SendPacket extends Packet {
     private final SendListener mListener;
     private boolean mCanceled;
-    private BlinkConn mBlinkConn;
+    private SendDispatcher mDispatcher;
 
 
     public SendPacket(byte type, SendListener listener) {
@@ -35,8 +35,19 @@ public abstract class SendPacket extends BlinkPacket {
         mListener = listener;
     }
 
-    public SendListener getListener() {
-        return mListener;
+    public void deliveryStart() {
+        if (mListener != null)
+            mListener.onSendStart(this);
+    }
+
+    public void deliveryProgress(float progress) {
+        if (mListener != null)
+            mListener.onSendProgress(this, progress);
+    }
+
+    public void deliveryCompleted() {
+        if (mListener != null)
+            mListener.onSendCompleted(this);
     }
 
     /**
@@ -46,14 +57,14 @@ public abstract class SendPacket extends BlinkPacket {
      */
     public void cancel() {
         mCanceled = true;
-        if (mBlinkConn != null) {
-            mBlinkConn.cancel(this);
-            mBlinkConn = null;
+        if (mDispatcher != null) {
+            mDispatcher.cancel(this);
+            mDispatcher = null;
         }
     }
 
     /**
-     * Get the packet iscanceled
+     * Get the packet isCanceled
      *
      * @return Is Canceled
      */
@@ -64,11 +75,11 @@ public abstract class SendPacket extends BlinkPacket {
     /**
      * Set The BlinkConn to Cancel from queue
      *
-     * @param blinkConn BlinkConn
+     * @param dispatcher SendDispatcher
      * @return SendPacket
      */
-    SendPacket setBlinkConn(BlinkConn blinkConn) {
-        mBlinkConn = blinkConn;
+    SendPacket setDispatcher(SendDispatcher dispatcher) {
+        mDispatcher = dispatcher;
         return this;
     }
 

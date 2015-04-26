@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
  * Created 04/16/2015
- * Changed 04/19/2015
+ * Changed 04/25/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,18 +17,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.qiujuer.blink.listener;
+package net.qiujuer.blink.core.delivery;
+
+import net.qiujuer.blink.core.SendPacket;
 
 /**
- * Send notify listener
+ * Send delivery interface
  */
-public interface SendListener {
+public interface SendDelivery {
+
     /**
-     * On sender send the packet call this
-     * On start progress == 0
-     * On end progress ==1
+     * Parses a start response from the receiver.
      *
-     * @param progress Send progress (0~1)
+     * @param packet ReceivePacket
      */
-    void onSendProgress(float progress);
+    void postSendStart(SendPacket packet);
+
+    /**
+     * Parses a progress response from the sender.
+     *
+     * @param packet   SendPacket
+     * @param progress Send progress
+     */
+    void postSendProgress(SendPacket packet, float progress);
+
+    /**
+     * Parses a end response from the receiver.
+     *
+     * @param packet ReceivePacket
+     */
+    void postSendCompleted(SendPacket packet);
 }

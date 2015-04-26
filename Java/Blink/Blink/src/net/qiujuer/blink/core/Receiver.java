@@ -19,7 +19,7 @@
  */
 package net.qiujuer.blink.core;
 
-import net.qiujuer.blink.async.AsyncEventArgs;
+import net.qiujuer.blink.async.IoEventArgs;
 import net.qiujuer.blink.kit.Disposable;
 
 /**
@@ -39,5 +39,5 @@ public interface Receiver extends Disposable {
      * @param e SocketAsyncEventArgs
      * @return Status
      */
-    boolean receiveAsync(AsyncEventArgs e);
+    boolean receiveAsync(IoEventArgs e);
 }

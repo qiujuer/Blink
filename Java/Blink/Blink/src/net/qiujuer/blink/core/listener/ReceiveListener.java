@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
- * Created 03/31/2015
- * Changed 04/02/2015
+ * Created 04/16/2015
+ * Changed 04/25/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,15 +19,35 @@
  */
 package net.qiujuer.blink.core.listener;
 
+import net.qiujuer.blink.core.Connector;
 import net.qiujuer.blink.core.ReceivePacket;
 
 /**
  * Receive notify listener
  */
 public interface ReceiveListener {
-    void onReceiveStart(int type, long id);
+    /**
+     * On Receiver receive new packet call this
+     *
+     * @param connector Connector
+     * @param packet    ReceivePacket
+     */
+    void onReceiveStart(Connector connector, ReceivePacket packet);
 
-    void onReceiveProgress(int type, long id, int total, int cur);
+    /**
+     * Receiver receive packet progress
+     *
+     * @param connector Connector
+     * @param packet    ReceivePacket
+     * @param progress  Receive Progress
+     */
+    void onReceiveProgress(Connector connector, ReceivePacket packet, float progress);
 
-    void onReceiveEnd(ReceivePacket entity);
+    /**
+     * On Receiver end receive packet call this
+     *
+     * @param connector Connector
+     * @param packet    ReceivePacket
+     */
+    void onReceiveCompleted(Connector connector, ReceivePacket packet);
 }

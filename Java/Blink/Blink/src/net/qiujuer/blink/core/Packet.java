@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
  * Created 04/16/2015
- * Changed 04/19/2015
+ * Changed 04/25/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,35 +20,33 @@
 package net.qiujuer.blink.core;
 
 /**
- * Bink Packet Interface
+ * Blink Data Packet
  */
-public interface Packet {
+public abstract class Packet {
+    protected byte mType;
+    protected long mLength;
+
+    public Packet(byte type) {
+        mType = type;
+    }
+
+    public byte getPacketType() {
+        return mType;
+    }
+
+    public long getLength() {
+        return mLength;
+    }
 
     /**
-     * Get packet type
+     * On Send or Receive start call this
      *
-     * @return Type
+     * @return Init status
      */
-    byte getPacketType();
+    public abstract boolean startPacket();
 
     /**
-     * Get packet length
-     *
-     * @return Size
+     * On Send or Receive end call this
      */
-    long getLength();
-
-    /**
-     * Set packet send or receive status
-     *
-     * @param isSuccess Status
-     */
-    void setSuccess(boolean isSuccess);
-
-    /**
-     * Get the packet is succeed
-     *
-     * @return Status
-     */
-    boolean isSucceed();
+    public abstract void endPacket();
 }

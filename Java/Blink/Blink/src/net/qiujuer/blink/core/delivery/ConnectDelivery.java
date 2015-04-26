@@ -17,32 +17,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.qiujuer.blink.core;
+package net.qiujuer.blink.core.delivery;
+
+import net.qiujuer.blink.core.Connector;
 
 /**
- * Receiver delivery interface
+ * Blink status delivery interface
  */
-public interface ReceiveDelivery {
+public interface ConnectDelivery {
     /**
-     * Parses a start response from the receiver.
-     *
-     * @param entity ReceivePacket
+     * On Socket Disconnect Post CallBack
      */
-    void postReceiveStart(ReceivePacket entity);
-
-    /**
-     * Parses a end response from the receiver.
-     *
-     * @param entity    ReceivePacket
-     * @param isSuccess isSuccess
-     */
-    void postReceiveEnd(ReceivePacket entity, boolean isSuccess);
-
-    /**
-     * Parses a progress response from the receiver.
-     *
-     * @param entity   ReceivePacket
-     * @param progress Receive progress
-     */
-    void postReceiveProgress(ReceivePacket entity, float progress);
+    void postConnectClosed(Connector connector);
 }

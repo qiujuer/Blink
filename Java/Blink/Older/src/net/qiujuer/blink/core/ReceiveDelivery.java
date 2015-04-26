@@ -19,7 +19,7 @@
  */
 package net.qiujuer.blink.core;
 
-import net.qiujuer.blink.listener.ReceiveListener;
+import net.qiujuer.blink.core.listener.ReceiveListener;
 
 /**
  * Receiver delivery interface

@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
  * Created 04/16/2015
- * Changed 04/19/2015
+ * Changed 04/25/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,14 +19,11 @@
  */
 package net.qiujuer.blink.core;
 
-import net.qiujuer.blink.kit.Disposable;
-
 /**
- * Blink status delivery interface
+ * Blink Packet Type
  */
-public interface BlinkDelivery extends Disposable {
-    /**
-     * On Socket Disconnect Post CallBack
-     */
-    void postBlinkDisconnect();
+public class PacketType {
+    public final static byte STRING = 1;
+    public final static byte BYTES = 2;
+    public final static byte FILE = 3;
 }

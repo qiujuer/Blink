@@ -21,7 +21,7 @@ package net.qiujuer.blink;
 
 import net.qiujuer.blink.core.BlinkConn;
 import net.qiujuer.blink.core.ReceiveParser;
-import net.qiujuer.blink.listener.ReceiveListener;
+import net.qiujuer.blink.core.listener.ReceiveListener;
 
 import java.io.File;
 import java.io.IOException;

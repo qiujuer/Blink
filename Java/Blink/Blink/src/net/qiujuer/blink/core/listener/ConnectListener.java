@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
  * Created 04/16/2015
- * Changed 04/19/2015
+ * Changed 04/25/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,15 +17,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.qiujuer.blink.listener;
+package net.qiujuer.blink.core.listener;
+
+import net.qiujuer.blink.core.Connector;
 
 /**
  * Blink notify listener
  */
-public interface BlinkListener {
+public interface ConnectListener {
 
     /**
-     * On Receive or Sender error by socket err call this
+     * On Receive or Sender socket error call this
+     *
+     * @param connector Connector
      */
-    void onBlinkDisconnect();
+    void onConnectClosed(Connector connector);
 }

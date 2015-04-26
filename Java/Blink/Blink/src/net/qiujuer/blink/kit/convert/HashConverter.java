@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
- * Created 03/31/2015
- * Changed 04/02/2015
+ * Created 04/16/2015
+ * Changed 04/19/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,17 +17,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.qiujuer.blink.core.listener;
-
-import net.qiujuer.blink.core.ReceivePacket;
+package net.qiujuer.blink.kit.convert;
 
 /**
- * Receive notify listener
+ * Hash Converter
  */
-public interface ReceiveListener {
-    void onReceiveStart(int type, long id);
+public class HashConverter {
+    private static final char HEX_DIGITS[] = {'0', '1', '2', '3', '4', '5',
+            '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
-    void onReceiveProgress(int type, long id, int total, int cur);
-
-    void onReceiveEnd(ReceivePacket entity);
+    /**
+     * Convert bytes to md5 string
+     *
+     * @param b bytes
+     * @return md5
+     */
+    public static String toMd5(byte[] b) {
+        StringBuilder sb = new StringBuilder(b.length * 2);
+        for (byte a : b) {
+            sb.append(HEX_DIGITS[(a & 0xf0) >>> 4]);
+            sb.append(HEX_DIGITS[a & 0x0f]);
+        }
+        return sb.toString();
+    }
 }

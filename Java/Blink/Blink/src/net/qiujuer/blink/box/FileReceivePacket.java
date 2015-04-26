@@ -19,7 +19,7 @@
  */
 package net.qiujuer.blink.box;
 
-import net.qiujuer.blink.kit.HashConverter;
+import net.qiujuer.blink.kit.convert.HashConverter;
 
 import java.io.File;
 import java.io.FileOutputStream;

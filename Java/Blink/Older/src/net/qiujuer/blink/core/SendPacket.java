@@ -19,7 +19,7 @@
  */
 package net.qiujuer.blink.core;
 
-import net.qiujuer.blink.listener.SendListener;
+import net.qiujuer.blink.core.listener.SendListener;
 
 import java.io.InputStream;
 

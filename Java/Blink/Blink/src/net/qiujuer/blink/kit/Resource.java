@@ -19,25 +19,33 @@
  */
 package net.qiujuer.blink.kit;
 
+import java.io.File;
+
 /**
- * Hash Converter
+ * Blink Files Resource
  */
-public class HashConverter {
-    private static final char HEX_DIGITS[] = {'0', '1', '2', '3', '4', '5',
-            '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+public interface Resource {
+    /**
+     * Create a file from resource.
+     *
+     * @return New file path
+     */
+    File create(long id);
 
     /**
-     * Convert bytes to md5 string
-     *
-     * @param b bytes
-     * @return md5
+     * Empties the resource by oneself
      */
-    public static String toMd5(byte[] b) {
-        StringBuilder sb = new StringBuilder(b.length * 2);
-        for (byte a : b) {
-            sb.append(HEX_DIGITS[(a & 0xf0) >>> 4]);
-            sb.append(HEX_DIGITS[a & 0x0f]);
-        }
-        return sb.toString();
-    }
+    void clear();
+
+    /**
+     * Empties the resource by the path
+     */
+    void clearAll();
+
+    /**
+     * Get the Mark
+     *
+     * @return Receive Mark
+     */
+    String getMark();
 }

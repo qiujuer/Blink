@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
  * Created 04/16/2015
- * Changed 04/19/2015
+ * Changed 04/25/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,9 +19,10 @@
  */
 package net.qiujuer.blink.async;
 
-import net.qiujuer.blink.core.BlinkDelivery;
+import net.qiujuer.blink.core.Connector;
 import net.qiujuer.blink.core.Receiver;
 import net.qiujuer.blink.core.Sender;
+import net.qiujuer.blink.core.delivery.ConnectDelivery;
 
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
@@ -32,49 +33,54 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Async socket adapter to send and receive byte
  */
-public class AsyncSocketAdapter implements Sender, Receiver, HandleSelector.HandleCallback {
-    private int mBufferSize;
-    private AsyncEventArgs mSendArgs;
-    private AsyncEventArgs mReceiveArgs;
-    private SocketChannel mChannel;
+public class AsyncSocketAdapter implements Sender, Receiver, SelectorFactory.HandleCallback {
     // Is Disposed
     protected final AtomicBoolean mDisposed = new AtomicBoolean(false);
+    private IoEventArgs mSendArgs;
+    private IoEventArgs mReceiveArgs;
+    private SocketChannel mChannel;
+    private Connector mConnector;
     // Posting responses.
-    private BlinkDelivery mBlinkDelivery;
+    private ConnectDelivery mConnectDelivery;
 
-    public AsyncSocketAdapter(SocketChannel channel, int bufferSize, BlinkDelivery blinkDelivery) throws IOException {
+    public AsyncSocketAdapter(SocketChannel channel, Connector connector, ConnectDelivery connectDelivery) throws IOException {
         mChannel = channel;
         mChannel.configureBlocking(false);
-        mBufferSize = bufferSize;
-        mBlinkDelivery = blinkDelivery;
+
+        mConnector = connector;
+        mConnectDelivery = connectDelivery;
     }
 
     @Override
     public int getReceiveBufferSize() {
-        return mBufferSize;
+        return mConnector.getBufferSize();
     }
 
     @Override
     public int getSendBufferSize() {
-        return mBufferSize;
+        return mConnector.getBufferSize();
     }
 
 
     @Override
-    public boolean receiveAsync(AsyncEventArgs buffer) {
+    public boolean receiveAsync(IoEventArgs buffer) {
+        if (mDisposed.get())
+            return false;
         mReceiveArgs = buffer;
         try {
-            return HandleSelector.getInstance().registerReceive(mChannel, this) != null;
+            return SelectorFactory.getInstance().registerReceive(mChannel, this) != null;
         } catch (ClosedChannelException e) {
             return false;
         }
     }
 
     @Override
-    public boolean sendAsync(AsyncEventArgs buffer) {
+    public boolean sendAsync(IoEventArgs buffer) {
+        if (mDisposed.get())
+            return false;
         mSendArgs = buffer;
         try {
-            return HandleSelector.getInstance().registerSend(mChannel, this) != null;
+            return SelectorFactory.getInstance().registerSend(mChannel, this) != null;
         } catch (ClosedChannelException e) {
             return false;
         }
@@ -83,7 +89,7 @@ public class AsyncSocketAdapter implements Sender, Receiver, HandleSelector.Hand
     @Override
     public void dispose() {
         if (mDisposed.compareAndSet(false, true)) {
-            HandleSelector.getInstance().unRegister(mChannel);
+            SelectorFactory.getInstance().unRegister(mChannel);
             mSendArgs = null;
             mReceiveArgs = null;
             try {
@@ -92,17 +98,22 @@ public class AsyncSocketAdapter implements Sender, Receiver, HandleSelector.Hand
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            BlinkDelivery blinkDelivery = mBlinkDelivery;
-            mBlinkDelivery = null;
-            if (blinkDelivery != null)
-                blinkDelivery.postBlinkDisconnect();
+
+            ConnectDelivery connectDelivery = mConnectDelivery;
+            mConnectDelivery = null;
+            if (connectDelivery != null)
+                connectDelivery.postConnectClosed(mConnector);
+
+            mConnector = null;
         }
     }
 
     @Override
     public void handleSend(SelectionKey key) {
+        if (mDisposed.get())
+            return;
         SocketChannel channel = (SocketChannel) key.channel();
-        AsyncEventArgs args = mSendArgs;
+        IoEventArgs args = mSendArgs;
         if (args != null) {
             try {
                 args.send(channel);
@@ -115,8 +126,10 @@ public class AsyncSocketAdapter implements Sender, Receiver, HandleSelector.Hand
 
     @Override
     public void handleReceive(SelectionKey key) {
+        if (mDisposed.get())
+            return;
         SocketChannel channel = (SocketChannel) key.channel();
-        AsyncEventArgs args = mReceiveArgs;
+        IoEventArgs args = mReceiveArgs;
         if (args != null) {
             try {
                 args.receive(channel);

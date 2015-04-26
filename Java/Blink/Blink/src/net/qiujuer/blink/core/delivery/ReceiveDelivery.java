@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
  * Created 04/16/2015
- * Changed 04/19/2015
+ * Changed 04/25/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,35 +17,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.qiujuer.blink.core;
+package net.qiujuer.blink.core.delivery;
 
-import java.io.File;
+import net.qiujuer.blink.core.Connector;
+import net.qiujuer.blink.core.ReceivePacket;
 
 /**
- * Blink Files Resource
+ * Receiver delivery interface
  */
-public interface Resource {
+public interface ReceiveDelivery {
     /**
-     * Create a file from resource.
+     * Parses a start response from the receiver.
      *
-     * @return New file path
+     * @param packet ReceivePacket
      */
-    File create(long id);
+    void postReceiveStart(Connector connector, ReceivePacket packet);
 
     /**
-     * Empties the resource by oneself
-     */
-    void clear();
-
-    /**
-     * Empties the resource by the path
-     */
-    void clearAll();
-
-    /**
-     * Get the Mark
+     * Parses a progress response from the receiver.
      *
-     * @return Receive Mark
+     * @param packet   ReceivePacket
+     * @param progress Receive progress
      */
-    String getMark();
+    void postReceiveProgress(Connector connector, ReceivePacket packet, float progress);
+
+    /**
+     * Parses a end response from the receiver.
+     *
+     * @param packet ReceivePacket
+     */
+    void postReceiveCompleted(Connector connector, ReceivePacket packet);
 }

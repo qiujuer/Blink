@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
  * Created 04/16/2015
- * Changed 04/19/2015
+ * Changed 04/25/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,9 +36,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Selector dispatcher manager
  * This can dispatcher sender and receiver by async
  */
-public class HandleSelector implements Disposable {
+public class SelectorFactory implements Disposable {
     // Instance
-    private static HandleSelector instance;
+    private static SelectorFactory instance;
 
     // Class
     private boolean isRunning = false;
@@ -46,16 +46,16 @@ public class HandleSelector implements Disposable {
     private final AtomicBoolean mRegWrite = new AtomicBoolean(false);
     private final Selector mReadSelector;
     private final Selector mWriteSelector;
-    private final HashMap<SelectionKey, HandleCallback> mReadRegisterMap = new HashMap<>();
-    private final HashMap<SelectionKey, HandleCallback> mWriteRegisterMap = new HashMap<>();
+    private final HashMap<SelectionKey, HandleCallback> mReadRegisterMap = new HashMap<SelectionKey, HandleCallback>();
+    private final HashMap<SelectionKey, HandleCallback> mWriteRegisterMap = new HashMap<SelectionKey, HandleCallback>();
     private final ExecutorService mHandlePool;
 
-    public static HandleSelector getInstance() {
+    public static SelectorFactory getInstance() {
         if (instance == null) {
-            synchronized (HandleSelector.class) {
+            synchronized (SelectorFactory.class) {
                 if (instance == null) {
                     try {
-                        instance = new HandleSelector();
+                        instance = new SelectorFactory();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -67,7 +67,7 @@ public class HandleSelector implements Disposable {
 
     public static void tryDispose() {
         if (instance != null) {
-            synchronized (HandleSelector.class) {
+            synchronized (SelectorFactory.class) {
                 if (instance != null) {
                     if (instance.canDispose()) {
                         instance.dispose();
@@ -78,7 +78,7 @@ public class HandleSelector implements Disposable {
         }
     }
 
-    HandleSelector() throws IOException {
+    SelectorFactory() throws IOException {
         isRunning = true;
 
         mReadSelector = Selector.open();
@@ -184,19 +184,20 @@ public class HandleSelector implements Disposable {
             public void run() {
                 while (isRunning) {
                     try {
-                        int n = mReadSelector.select();
-                        if (n == 0) {
+
+                        if (mReadSelector.select() == 0) {
                             waitReadRegister();
                             continue;
                         }
-                        Iterator ite = mReadSelector.selectedKeys().iterator();
-                        while (ite.hasNext()) {
-                            SelectionKey key = (SelectionKey) ite.next();
-                            ite.remove();
+
+                        Set<SelectionKey> keys = mReadSelector.selectedKeys();
+                        for (SelectionKey key : keys) {
                             if (key.isReadable()) {
                                 handleRead(key);
                             }
                         }
+                        keys.clear();
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -214,19 +215,20 @@ public class HandleSelector implements Disposable {
             public void run() {
                 while (isRunning) {
                     try {
-                        int n = mWriteSelector.select();
-                        if (n == 0) {
+
+                        if (mWriteSelector.select() == 0) {
                             waitWriteRegister();
                             continue;
                         }
-                        Iterator ite = mWriteSelector.selectedKeys().iterator();
-                        while (ite.hasNext()) {
-                            SelectionKey key = (SelectionKey) ite.next();
-                            ite.remove();
+
+                        Set<SelectionKey> keys = mWriteSelector.selectedKeys();
+                        for (SelectionKey key : keys) {
                             if (key.isWritable()) {
                                 handleWrite(key);
                             }
                         }
+                        keys.clear();
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

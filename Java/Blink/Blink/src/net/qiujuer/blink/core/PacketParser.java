@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
- * Created 03/31/2015
- * Changed 04/02/2015
+ * Created 04/25/2015
+ * Changed 04/25/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,17 +17,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.qiujuer.blink.core.listener;
+package net.qiujuer.blink.core;
 
-import net.qiujuer.blink.core.ReceivePacket;
+import net.qiujuer.blink.async.IoEventArgs;
 
 /**
- * Receive notify listener
+ * ReceivePacket PacketParser
+ * Parser IoEventArgs {@link IoEventArgs} to packet
  */
-public interface ReceiveListener {
-    void onReceiveStart(int type, long id);
+public abstract class PacketParser {
+    protected ReceivePacket mPacket;
+    protected IoEventArgs mArgs;
 
-    void onReceiveProgress(int type, long id, int total, int cur);
+    public abstract float parse();
 
-    void onReceiveEnd(ReceivePacket entity);
+    public ReceivePacket getPacket() {
+        return mPacket;
+    }
+
+    public void setEventArgs(IoEventArgs args) {
+        mArgs = args;
+    }
 }

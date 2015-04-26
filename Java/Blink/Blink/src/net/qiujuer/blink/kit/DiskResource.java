@@ -19,8 +19,6 @@
  */
 package net.qiujuer.blink.kit;
 
-import net.qiujuer.blink.core.Resource;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -54,7 +52,7 @@ public class DiskResource implements Resource {
         // Create
         if (!mRootDirectory.exists()) {
             if (!mRootDirectory.mkdirs()) {
-                BlinkLog.e("Unable to create resource dir %s", mRootDirectory.getAbsolutePath());
+                //BlinkLog.e("Unable to create resource dir %s", mRootDirectory.getAbsolutePath());
             }
         }
     }
@@ -84,7 +82,7 @@ public class DiskResource implements Resource {
                     file.delete();
             }
         }
-        BlinkLog.d("Resource cleared with mark: " + mMark);
+        //BlinkLog.d("Resource cleared with mark: " + mMark);
     }
 
     @Override
@@ -95,7 +93,7 @@ public class DiskResource implements Resource {
                 file.delete();
             }
         }
-        BlinkLog.d("Resource cleared path.");
+        //BlinkLog.d("Resource cleared path.");
     }
 
     @Override

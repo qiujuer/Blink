@@ -17,34 +17,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.qiujuer.blink.listener;
+package net.qiujuer.blink.core.listener;
 
-import net.qiujuer.blink.core.ReceivePacket;
+import net.qiujuer.blink.core.SendPacket;
 
 /**
- * Receive notify listener
+ * Send notify listener
  */
-public interface ReceiveListener {
-    /**
-     * On Receiver receive new packet call this
-     *
-     * @param type Packet Type
-     * @param id   Packet Id
-     */
-    void onReceiveStart(byte type, long id);
+public interface SendListener {
 
     /**
-     * Receiver receive packet progress
+     * On start send the packet call
      *
-     * @param packet   ReceivePacket
-     * @param progress Receive Progress
+     * @param packet SendPacket
      */
-    void onReceiveProgress(ReceivePacket packet, float progress);
+    void onSendStart(SendPacket packet);
+
 
     /**
-     * On Receiver end receive packet call this
+     * On the packet send progress changed call
      *
-     * @param packet ReceivePacket
+     * @param packet   SendPacket
+     * @param progress Progress (0~1)
      */
-    void onReceiveEnd(ReceivePacket packet);
+    void onSendProgress(SendPacket packet, float progress);
+
+    /**
+     * On send completed call
+     *
+     * @param packet SendPacket
+     */
+    void onSendCompleted(SendPacket packet);
 }

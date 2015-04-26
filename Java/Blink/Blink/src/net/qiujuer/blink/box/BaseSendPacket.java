@@ -20,7 +20,7 @@
 package net.qiujuer.blink.box;
 
 import net.qiujuer.blink.core.SendPacket;
-import net.qiujuer.blink.listener.SendListener;
+import net.qiujuer.blink.core.listener.SendListener;
 
 import java.io.InputStream;
 

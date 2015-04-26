@@ -22,10 +22,9 @@ package net.qiujuer.blink.kit;
 import net.qiujuer.blink.box.ByteReceivePacket;
 import net.qiujuer.blink.box.FileReceivePacket;
 import net.qiujuer.blink.box.StringReceivePacket;
-import net.qiujuer.blink.core.BlinkPacket;
 import net.qiujuer.blink.core.BlinkParser;
+import net.qiujuer.blink.core.PacketType;
 import net.qiujuer.blink.core.ReceivePacket;
-import net.qiujuer.blink.core.Resource;
 
 import java.io.File;
 
@@ -43,13 +42,13 @@ public class BlinkParserImpl implements BlinkParser {
         long id = ++mId;
         ReceivePacket packet = null;
         switch (type) {
-            case BlinkPacket.PacketType.STRING:
+            case PacketType.STRING:
                 packet = new StringReceivePacket(id, type, len);
                 break;
-            case BlinkPacket.PacketType.BYTES:
+            case PacketType.BYTES:
                 packet = new ByteReceivePacket(id, type, len);
                 break;
-            case BlinkPacket.PacketType.FILE:
+            case PacketType.FILE:
                 File file = mResource.create(id);
                 if (file != null)
                     packet = new FileReceivePacket(id, type, len, file);

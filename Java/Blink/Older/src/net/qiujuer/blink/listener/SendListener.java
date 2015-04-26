@@ -17,7 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.qiujuer.blink.listener;
+package net.qiujuer.blink.core.listener;
 
 /**
  * Send notify listener

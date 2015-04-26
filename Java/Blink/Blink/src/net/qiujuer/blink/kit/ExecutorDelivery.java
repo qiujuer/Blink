@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
  * Created 04/16/2015
- * Changed 04/19/2015
+ * Changed 04/25/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,169 +19,179 @@
  */
 package net.qiujuer.blink.kit;
 
-import net.qiujuer.blink.core.BlinkDelivery;
-import net.qiujuer.blink.core.ReceiveDelivery;
+import net.qiujuer.blink.core.Connector;
 import net.qiujuer.blink.core.ReceivePacket;
-import net.qiujuer.blink.core.SendDelivery;
 import net.qiujuer.blink.core.SendPacket;
-import net.qiujuer.blink.listener.BlinkListener;
-import net.qiujuer.blink.listener.ReceiveListener;
+import net.qiujuer.blink.core.delivery.ConnectDelivery;
+import net.qiujuer.blink.core.delivery.ReceiveDelivery;
+import net.qiujuer.blink.core.delivery.SendDelivery;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Delivers send and receive responses.
  */
-public class ExecutorDelivery implements BlinkDelivery, SendDelivery, ReceiveDelivery {
-    /**
-     * Used for posting responses, typically to the main thread.
-     */
-    private final boolean isNull;
+public class ExecutorDelivery implements ConnectDelivery, SendDelivery, ReceiveDelivery {
     private Executor mPoster;
-    private BlinkListener mBlinkListener;
-    private ReceiveListener mReceiveListener;
 
-    public ExecutorDelivery(Executor executor, BlinkListener blinkListener, ReceiveListener receiveListener) {
-        if ((isNull = executor == null)) {
-            executor = Executors.newSingleThreadExecutor();
+    public ExecutorDelivery(Executor executor) {
+        if ((executor == null)) {
+            executor = new Executor() {
+                @Override
+                public void execute(Runnable command) {
+                    command.run();
+                }
+            };
         }
 
         mPoster = executor;
-        mBlinkListener = blinkListener;
-        mReceiveListener = receiveListener;
     }
 
     @Override
-    public void postBlinkDisconnect() {
-        BlinkListener listener = mBlinkListener;
-        if (listener != null)
-            mPoster.execute(new BlinkDeliveryRunnable(listener));
+    public void postSendStart(SendPacket packet) {
+        mPoster.execute(new SendStartDeliveryRunnable(packet));
     }
 
     @Override
-    public void postSendProgress(SendPacket entity, float progress) {
-        if (entity != null && entity.getListener() != null)
-            mPoster.execute(new SendDeliveryRunnable(entity, progress));
+    public void postSendProgress(SendPacket packet, float progress) {
+        mPoster.execute(new SendProgressDeliveryRunnable(packet, progress));
     }
 
     @Override
-    public void postReceiveStart(ReceivePacket entity) {
-        ReceiveListener listener = mReceiveListener;
-        if (listener != null && entity != null)
-            mPoster.execute(new ReceiveStartDeliveryRunnable(listener, entity));
+    public void postSendCompleted(SendPacket packet) {
+        mPoster.execute(new SendCompletedDeliveryRunnable(packet));
     }
 
     @Override
-    public void postReceiveEnd(ReceivePacket entity, boolean isSuccess) {
-        ReceiveListener listener = mReceiveListener;
-        if (listener != null && entity != null) {
-            entity.setSuccess(isSuccess);
-            mPoster.execute(new ReceiveEndDeliveryRunnable(listener, entity));
-        }
+    public void postConnectClosed(Connector connector) {
+        mPoster.execute(new ConnectDeliveryRunnable(connector));
     }
 
     @Override
-    public void postReceiveProgress(ReceivePacket entity, float progress) {
-        ReceiveListener listener = mReceiveListener;
-        if (listener != null && entity != null)
-            mPoster.execute(new ReceiveProgressDeliveryRunnable(listener, entity, progress));
+    public void postReceiveStart(Connector connector, ReceivePacket packet) {
+        mPoster.execute(new ReceiveStartDeliveryRunnable(connector, packet));
     }
 
     @Override
-    public synchronized void dispose() {
-        mBlinkListener = null;
-        mReceiveListener = null;
-        if (isNull && mPoster != null) {
-            if (mPoster instanceof ExecutorService)
-                ((ExecutorService) mPoster).shutdownNow();
-        }
-        mPoster = null;
+    public void postReceiveProgress(Connector connector, ReceivePacket packet, float progress) {
+        mPoster.execute(new ReceiveProgressDeliveryRunnable(connector, packet, progress));
+    }
+
+    @Override
+    public void postReceiveCompleted(Connector connector, ReceivePacket packet) {
+        mPoster.execute(new ReceiveCompletedDeliveryRunnable(connector, packet));
     }
 
 
-    private class BlinkDeliveryRunnable implements Runnable {
-        private BlinkListener listener;
+    private class ConnectDeliveryRunnable implements Runnable {
+        Connector connector;
 
-        public BlinkDeliveryRunnable(BlinkListener listener) {
-            this.listener = listener;
+        public ConnectDeliveryRunnable(Connector connector) {
+            this.connector = connector;
         }
 
         public void run() {
-            if (listener != null) {
-                listener.onBlinkDisconnect();
-                listener = null;
+            if (!connector.isClosed()) {
+                connector.deliveryConnectClosed();
             }
+            connector = null;
         }
     }
 
-    private class ReceiveStartDeliveryRunnable implements Runnable {
-        private ReceiveListener listener;
-        private ReceivePacket entity;
+    private class ReceiveStartDeliveryRunnable extends ConnectDeliveryRunnable {
+        ReceivePacket packet;
 
-        public ReceiveStartDeliveryRunnable(ReceiveListener listener, ReceivePacket entity) {
-            this.listener = listener;
-            this.entity = entity;
+        public ReceiveStartDeliveryRunnable(Connector connector, ReceivePacket packet) {
+            super(connector);
+            this.packet = packet;
         }
 
+        @Override
         public void run() {
-            listener.onReceiveStart(entity.getPacketType(), entity.getId());
-            entity = null;
-            listener = null;
+            if (!connector.isClosed()) {
+                connector.deliveryReceiveStart(packet);
+            }
+            connector = null;
+            packet = null;
         }
     }
 
-    private class ReceiveEndDeliveryRunnable implements Runnable {
-        private ReceiveListener listener;
-        private ReceivePacket entity;
+    private class ReceiveCompletedDeliveryRunnable extends ConnectDeliveryRunnable {
+        ReceivePacket packet;
 
-        public ReceiveEndDeliveryRunnable(ReceiveListener listener, ReceivePacket entity) {
-            this.listener = listener;
-            this.entity = entity;
+        public ReceiveCompletedDeliveryRunnable(Connector connector, ReceivePacket packet) {
+            super(connector);
+            this.packet = packet;
         }
 
+        @Override
         public void run() {
-            listener.onReceiveEnd(entity);
-            entity = null;
-            listener = null;
+            if (!connector.isClosed()) {
+                connector.deliveryReceiveCompleted(packet);
+            }
+            connector = null;
+            packet = null;
         }
     }
 
-    private class ReceiveProgressDeliveryRunnable implements Runnable {
-        private ReceiveListener listener;
-        private ReceivePacket entity;
-        private float progress;
+    private class ReceiveProgressDeliveryRunnable extends ReceiveStartDeliveryRunnable {
+        float progress;
 
-        public ReceiveProgressDeliveryRunnable(ReceiveListener listener, ReceivePacket entity, float progress) {
-            this.listener = listener;
-            this.entity = entity;
+        public ReceiveProgressDeliveryRunnable(Connector connector, ReceivePacket packet, float progress) {
+            super(connector, packet);
             this.progress = progress;
         }
 
         public void run() {
-            listener.onReceiveProgress(entity, progress);
-            entity = null;
-            listener = null;
+            if (!connector.isClosed()) {
+                connector.deliveryReceiveProgress(packet, progress);
+            }
+            connector = null;
+            packet = null;
         }
     }
 
-    private class SendDeliveryRunnable implements Runnable {
-        private SendPacket entity;
-        private float progress;
+    private class SendStartDeliveryRunnable implements Runnable {
+        SendPacket packet;
 
-        public SendDeliveryRunnable(SendPacket entity, float progress) {
-            this.entity = entity;
+        public SendStartDeliveryRunnable(SendPacket packet) {
+            this.packet = packet;
+        }
+
+        public void run() {
+            if (!packet.isCanceled()) {
+                packet.deliveryStart();
+            }
+            packet = null;
+        }
+    }
+
+    private class SendProgressDeliveryRunnable extends SendStartDeliveryRunnable {
+        float progress;
+
+        public SendProgressDeliveryRunnable(SendPacket packet, float progress) {
+            super(packet);
             this.progress = progress;
         }
 
+        public void run() {
+            if (!packet.isCanceled()) {
+                packet.deliveryProgress(progress);
+            }
+            packet = null;
+        }
+    }
+
+    private class SendCompletedDeliveryRunnable extends SendStartDeliveryRunnable {
+        public SendCompletedDeliveryRunnable(SendPacket packet) {
+            super(packet);
+        }
 
         public void run() {
-            if (!entity.isCanceled()) {
-                entity.getListener().onSendProgress(progress);
+            if (!packet.isCanceled()) {
+                packet.deliveryCompleted();
             }
-
-            entity = null;
+            packet = null;
         }
     }
 

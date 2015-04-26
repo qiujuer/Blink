@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
- * Created 04/16/2015
- * Changed 04/19/2015
+ * Created 04/25/2015
+ * Changed 04/25/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,18 +19,23 @@
  */
 package net.qiujuer.blink.core;
 
-import net.qiujuer.blink.kit.Disposable;
+import net.qiujuer.blink.async.IoEventArgs;
 
 /**
- * Send delivery interface
+ * SendPacket formatter
+ * Format packet to IoEventArgs {@link IoEventArgs}
  */
-public interface SendDelivery extends Disposable {
+public abstract class PacketFormatter {
+    protected SendPacket mPacket;
+    protected IoEventArgs mArgs;
 
-    /**
-     * Parses a progress response from the sender.
-     *
-     * @param entity   SendPacket
-     * @param progress Send progress
-     */
-    void postSendProgress(SendPacket entity, float progress);
+    public abstract float format();
+
+    public void setPacket(SendPacket packet) {
+        mPacket = packet;
+    }
+
+    public void setEventArgs(IoEventArgs args) {
+        mArgs = args;
+    }
 }

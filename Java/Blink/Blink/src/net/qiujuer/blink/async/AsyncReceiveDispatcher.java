@@ -2,7 +2,7 @@
  * Copyright (C) 2014 Qiujuer <qiujuer@live.cn>
  * WebSite http://www.qiujuer.net
  * Created 04/16/2015
- * Changed 04/19/2015
+ * Changed 04/26/2015
  * Version 1.0.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,177 +19,88 @@
  */
 package net.qiujuer.blink.async;
 
-import net.qiujuer.blink.core.BlinkParser;
-import net.qiujuer.blink.core.ReceiveDelivery;
+import net.qiujuer.blink.BlinkClient;
+import net.qiujuer.blink.core.Connector;
+import net.qiujuer.blink.core.PacketParser;
+import net.qiujuer.blink.core.ReceiveDispatcher;
 import net.qiujuer.blink.core.ReceivePacket;
 import net.qiujuer.blink.core.Receiver;
-import net.qiujuer.blink.kit.BitConverter;
+import net.qiujuer.blink.core.delivery.ReceiveDelivery;
 
 /**
- * Provides for performing receive dispatch from a queue of BinkConn {@link net.qiujuer.blink.core.BlinkConn}.
+ * Provides for performing receive dispatch from a queue of BinkConn {@link BlinkClient}.
  */
-public class AsyncReceiveDispatcher extends AsyncEventArgs {
+public class AsyncReceiveDispatcher extends AsyncDispatcher implements ReceiveDispatcher {
     // Parser the receive data type
-    private BlinkParser mParser;
+    private PacketParser mParser;
     // Receive Data
     private Receiver mReceiver;
     // Posting responses.
     private ReceiveDelivery mReceiveDelivery;
-
-    private ReceivePacket mReceivePacket;
-    private short mSurplusInfoLen;
-    private long mSurplusLen;
+    // Blink Connector
+    private Connector mConnector;
 
 
-    public AsyncReceiveDispatcher(Receiver receiver, BlinkParser parser, ReceiveDelivery receiveDelivery, float progressPrecision) {
+    public AsyncReceiveDispatcher(Receiver receiver, PacketParser parser, Connector connector, ReceiveDelivery receiveDelivery) {
         // Set Buffer
-        super(receiver.getReceiveBufferSize(), progressPrecision);
+        super(receiver.getReceiveBufferSize(), connector.getProgressPrecision());
 
         mReceiver = receiver;
         mParser = parser;
         mReceiveDelivery = receiveDelivery;
+        mConnector = connector;
 
         // Start
-        ReceiveAsync(0);
+        mParser.setEventArgs(this);
+        receiveAsync();
     }
 
-
-    private void ReceiveAsync(long size) {
-        int count;
-        if (size > mReceiver.getReceiveBufferSize())
-            count = mReceiver.getReceiveBufferSize();
-        else if (size <= 0)
-            count = HeadSize;
-        else
-            count = (int) size;
-
-        ReceiveAsync(0, count);
-    }
-
-    private void ReceiveAsync(int offset, int count) {
+    /**
+     * Start async receive
+     */
+    private void receiveAsync() {
         if (mDisposed.get())
             return;
-
-        // Set post buffer
-        setBuffer(offset, count);
-
-        // Post a receive to the connection
-        mStatus = mReceiver.receiveAsync(this);
-        if (!mStatus) {
-            // On sync call
-            onCompleted(this);
-        }
+        // As soon as the client is connected, post a receive to the connection
+        mReceiver.receiveAsync(this);
     }
 
-    private void ReceiveHead(byte[] buffer) {
-        mSurplusLen = 0;
-        mSurplusInfoLen = 0;
-        mProgress = 0;
-
-        byte type = buffer[0];
-        long len = BitConverter.toLong(buffer, 1);
-        short info = BitConverter.toShort(buffer, HeadSize - 2);
-
-        if (len > 0) {
-            // Set Length
-            mSurplusLen = len;
-            mSurplusInfoLen = info;
-
-            // Parse receive packet
-            ReceivePacket packet = mParser.parseReceive(type, len);
-
-            if (packet != null && packet.startPacket()) {
-                mReceivePacket = packet;
-
-                // Notify
-                ReceiveDelivery delivery = mReceiveDelivery;
-                if (delivery != null)
-                    delivery.postReceiveStart(packet);
-
+    /**
+     * Receive packet by parser
+     * Notify send progress
+     */
+    private void receivePacket() {
+        float progress = mParser.parse();
+        // Notify
+        ReceiveDelivery delivery = mReceiveDelivery;
+        if (delivery != null && isNotifyProgress(progress)) {
+            if (progress == 0) {
+                delivery.postReceiveStart(mConnector, mParser.getPacket());
+            } else if (progress == 1) {
+                delivery.postReceiveCompleted(mConnector, mParser.getPacket());
             } else {
-                // Set Null
-                mReceivePacket = null;
+                delivery.postReceiveProgress(mConnector, mParser.getPacket(), progress);
             }
-        }
-
-        ReceiveAsync(mSurplusInfoLen > 0 ? mSurplusInfoLen : mSurplusLen);
-    }
-
-    private void ReceiveInfo(byte[] buffer, int offset, int count) {
-        // Set len
-        mSurplusInfoLen -= (short) count;
-
-        if (mSurplusInfoLen > 0) {
-            // Receive info
-            ReceiveAsync(offset + count, mSurplusInfoLen);
-        } else {
-            // Set Info
-            ReceivePacket packet = mReceivePacket;
-            if (packet != null) {
-                packet.writeInfo(buffer, 0, offset + count);
-            }
-
-            // Receive entity
-            ReceiveAsync(mSurplusLen);
         }
     }
 
-    private void ReceiveEntity(byte[] buffer, int offset, int count) {
-        // Set len
-        mSurplusLen -= count;
-
-        ReceivePacket packet = mReceivePacket;
-
-        if (packet != null) {
-            packet.write(buffer, offset, count);
-
-            // Check
-            ReceiveDelivery delivery = mReceiveDelivery;
-            if (delivery != null) {
-                // Notify progress
-                float len = packet.getLength();
-
-                // Post Callback
-                float progress = (len - mSurplusLen) / len;
-                if (isNotifyProgress(progress)) {
-                    // Notify
-                    delivery.postReceiveProgress(packet, mProgress);
-                }
-            }
-
-            if (mSurplusLen <= 0) {
-                // End
-                packet.endPacket();
-
-                // Notify
-                if (delivery != null)
-                    delivery.postReceiveEnd(packet, mStatus);
-
-                // Set Null
-                mReceivePacket = null;
-            }
-        }
-
-        // Receive next entity
-        ReceiveAsync(mSurplusLen);
-    }
-
+    /**
+     * On async receive completed
+     *
+     * @param e IoEventArgs {@link IoEventArgs}
+     */
     @Override
-    void onCompleted(AsyncEventArgs e) {
+    protected void onCompleted(IoEventArgs e) {
         // Check if the remote host closed the connection
-        if (e.getBytesTransferred() > 0) {
-            // Receive Entity
-            if (mSurplusInfoLen > 0)
-                ReceiveInfo(e.getBuffer(), e.getOffset(), e.getBytesTransferred());
-            else if (mSurplusLen > 0)
-                ReceiveEntity(e.getBuffer(), e.getOffset(), e.getBytesTransferred());
-            else {
-                if (e.getBytesTransferred() < e.getCount())
-                    // Full the head
-                    ReceiveAsync(e.getOffset() + e.getBytesTransferred(), e.getCount() - e.getBytesTransferred());
-                else
-                    // Receive Head
-                    ReceiveHead(e.getBuffer());
+        int transferred = e.getBytesTransferred();
+        if (transferred > 0) {
+            if (transferred < e.getCount()) {
+                // Full the head
+                e.setBuffer(e.getOffset() + transferred, e.getCount() - transferred);
+                receiveAsync();
+            } else {
+                receivePacket();
+                receiveAsync();
             }
         } else {
             dispose();
@@ -199,28 +110,12 @@ public class AsyncReceiveDispatcher extends AsyncEventArgs {
     @Override
     public void dispose() {
         if (mDisposed.compareAndSet(false, true)) {
-            super.dispose();
-
+            ReceivePacket packet = mParser.getPacket();
+            if (packet != null)
+                packet.endPacket();
             mParser = null;
-
-            ReceivePacket packet = mReceivePacket;
-            mReceivePacket = null;
-
-            Receiver receiver = mReceiver;
             mReceiver = null;
-
-            ReceiveDelivery receiveDelivery = mReceiveDelivery;
             mReceiveDelivery = null;
-
-            if (packet != null && receiveDelivery != null) {
-                if (mSurplusLen > 0) {
-                    packet.endPacket();
-                    receiveDelivery.postReceiveEnd(packet, false);
-                }
-            }
-
-            if (receiver != null)
-                receiver.dispose();
         }
     }
 }

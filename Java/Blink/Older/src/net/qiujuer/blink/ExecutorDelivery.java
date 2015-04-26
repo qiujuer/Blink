@@ -23,7 +23,7 @@ import net.qiujuer.blink.core.ReceiveDelivery;
 import net.qiujuer.blink.core.ReceivePacket;
 import net.qiujuer.blink.core.SendDelivery;
 import net.qiujuer.blink.core.SendPacket;
-import net.qiujuer.blink.listener.ReceiveListener;
+import net.qiujuer.blink.core.listener.ReceiveListener;
 
 import java.util.concurrent.Executor;
 

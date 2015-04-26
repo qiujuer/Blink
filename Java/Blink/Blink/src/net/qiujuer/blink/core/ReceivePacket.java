@@ -22,7 +22,7 @@ package net.qiujuer.blink.core;
 /**
  * Receive Packet
  */
-public abstract class ReceivePacket extends BlinkPacket {
+public abstract class ReceivePacket extends Packet {
     private final long mId;
     private String mHash;
 
