@@ -28,6 +28,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,8 +47,8 @@ public class HandleSelector implements Disposable {
     private final AtomicBoolean mRegWrite = new AtomicBoolean(false);
     private final Selector mReadSelector;
     private final Selector mWriteSelector;
-    private final HashMap<SelectionKey, HandleCallback> mReadRegisterMap = new HashMap<>();
-    private final HashMap<SelectionKey, HandleCallback> mWriteRegisterMap = new HashMap<>();
+    private final HashMap<SelectionKey, HandleCallback> mReadRegisterMap = new HashMap<SelectionKey, HandleCallback>();
+    private final HashMap<SelectionKey, HandleCallback> mWriteRegisterMap = new HashMap<SelectionKey, HandleCallback>();
     private final ExecutorService mHandlePool;
 
     public static HandleSelector getInstance() {
@@ -189,14 +190,14 @@ public class HandleSelector implements Disposable {
                             waitReadRegister();
                             continue;
                         }
-                        Iterator ite = mReadSelector.selectedKeys().iterator();
-                        while (ite.hasNext()) {
-                            SelectionKey key = (SelectionKey) ite.next();
-                            ite.remove();
+                        Set<SelectionKey> keys = mReadSelector.selectedKeys();
+                        for (SelectionKey key : keys) {
                             if (key.isReadable()) {
                                 handleRead(key);
                             }
                         }
+                        keys.clear();
+                        keys = mReadSelector.selectedKeys();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

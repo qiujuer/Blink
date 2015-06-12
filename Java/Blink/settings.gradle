@@ -1,2 +1,2 @@
-include ':BlinkSample'
-include ':Blink'
+include ':sample'
+include ':library'
